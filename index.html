@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ULTIMA | キャバクラ向け総合店舗管理サービス</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #15111a;
+    --bg-2: #1c1622;
+    --bg-3: #211a29;
+    --line: #322a3c;
+    --gold: #c9a15c;
+    --gold-light: #e3c888;
+    --text: #f2ede6;
+    --muted: #a99bb0;
+    --muted-2: #7b7186;
+  }
+  *{ box-sizing: border-box; margin: 0; padding: 0; }
+  html{ scroll-behavior: smooth; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Zen Kaku Gothic New", sans-serif;
+    line-height: 1.75;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  .serif{ font-family: "Shippori Mincho", serif; }
+  a{ color: inherit; text-decoration: none; }
+  img, svg{ display:block; max-width:100%; }
+
+  .wrap{ max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+  section{ position: relative; }
+
+  /* ---------- texture ---------- */
+  .grain{
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    opacity: 0.035; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- nav ---------- */
+  header{
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    background: rgba(21,17,26,0.72);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(201,161,92,0.14);
+  }
+  nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 18px 28px; max-width: 1120px; margin: 0 auto;
+  }
+  .logo{ font-size: 20px; letter-spacing: 0.12em; color: var(--gold-light); font-weight: 600; }
+  .nav-links{ display:flex; gap: 36px; font-size: 13.5px; color: var(--muted); }
+  .nav-links a:hover{ color: var(--gold-light); }
+  .nav-cta{
+    border: 1px solid rgba(201,161,92,0.5); color: var(--gold-light);
+    padding: 9px 20px; border-radius: 999px; font-size: 13px; letter-spacing: 0.03em;
+    transition: all .2s ease;
+  }
+  .nav-cta:hover{ background: rgba(201,161,92,0.12); border-color: var(--gold); }
+  @media (max-width: 760px){ .nav-links{ display:none; } }
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height: 100svh; display:flex; align-items:center;
+    padding-top: 110px; padding-bottom: 80px;
+    background:
+      radial-gradient(ellipse 900px 500px at 82% -6%, rgba(201,161,92,0.16), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 10% 110%, rgba(201,161,92,0.08), transparent 60%);
+  }
+  .hero-grid{
+    display:grid; grid-template-columns: 1.15fr 0.85fr; gap: 60px; align-items:center;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap: 10px;
+    font-size: 12.5px; letter-spacing: 0.22em; color: var(--gold-light);
+    margin-bottom: 26px; opacity: 0; animation: rise .8s ease forwards .1s;
+  }
+  .eyebrow::before{ content:""; width: 26px; height:1px; background: var(--gold); }
+  .hero h1{
+    font-size: clamp(40px, 5.6vw, 68px); font-weight: 800; line-height: 1.28;
+    letter-spacing: 0.01em;
+    opacity: 0; animation: rise .9s ease forwards .25s;
+  }
+  .hero h1 .accent{ color: var(--gold-light); }
+  .hero p.lead{
+    margin-top: 26px; font-size: 16.5px; color: var(--muted); max-width: 480px;
+    opacity: 0; animation: rise .9s ease forwards .45s;
+  }
+  .hero-ctas{
+    margin-top: 38px; display:flex; gap: 16px; flex-wrap: wrap;
+    opacity: 0; animation: rise .9s ease forwards .6s;
+  }
+  .btn-primary{
+    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    color: #201509; font-weight: 700; font-size: 14.5px;
+    padding: 15px 30px; border-radius: 999px; letter-spacing: 0.02em;
+    box-shadow: 0 12px 30px -12px rgba(201,161,92,0.55);
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 16px 36px -12px rgba(201,161,92,0.7); }
+  .btn-ghost{
+    border: 1px solid var(--line); color: var(--text); font-size: 14.5px;
+    padding: 15px 26px; border-radius: 999px; transition: border-color .2s ease;
+  }
+  .btn-ghost:hover{ border-color: var(--gold); }
+
+  .stat-row{
+    margin-top: 56px; display:flex; gap: 44px; flex-wrap: wrap;
+    opacity: 0; animation: rise .9s ease forwards .78s;
+  }
+  .stat-row .num{ font-family:"Shippori Mincho",serif; font-size: 30px; color: var(--gold-light); font-weight: 600; }
+  .stat-row .lab{ font-size: 12px; color: var(--muted-2); margin-top: 4px; letter-spacing: 0.03em; }
+
+  @keyframes rise{ from{ opacity:0; transform: translateY(16px);} to{ opacity:1; transform: translateY(0);} }
+
+  /* phone mock */
+  .phone-stage{ position: relative; display:flex; justify-content:center; opacity:0; animation: rise 1s ease forwards .5s; }
+  .phone{
+    width: 270px; border-radius: 34px; background: linear-gradient(160deg, #241c2c, #16111c);
+    border: 1px solid rgba(201,161,92,0.25);
+    padding: 16px 14px; box-shadow: 0 40px 80px -30px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.02) inset;
+  }
+  .phone-notch{ width: 60px; height: 5px; background: rgba(255,255,255,0.08); border-radius: 4px; margin: 0 auto 14px; }
+  .phone-screen{
+    background: var(--bg-2); border-radius: 20px; padding: 20px 16px 22px;
+    border: 1px solid var(--line);
+  }
+  .qr-card{
+    background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .qr-mock{
+    width: 130px; height: 130px; background:
+      repeating-linear-gradient(0deg,#15111a 0 6px, transparent 6px 12px),
+      repeating-linear-gradient(90deg,#15111a 0 6px, transparent 6px 12px);
+    background-blend-mode: multiply; opacity: 0.9;
+  }
+  .phone-line{ height: 8px; background: var(--line); border-radius: 4px; margin-bottom: 10px; }
+  .phone-line.w60{ width: 60%; }
+  .phone-line.w80{ width: 80%; }
+  .phone-line.w40{ width: 40%; background: var(--gold); opacity:.5; }
+  .phone-badge{
+    display:inline-block; margin-top: 14px; font-size: 11px; color: var(--gold-light);
+    border: 1px solid rgba(201,161,92,0.4); padding: 5px 12px; border-radius: 999px;
+  }
+  .float-card{
+    position:absolute; background: var(--bg-3); border:1px solid var(--line);
+    border-radius: 14px; padding: 14px 18px; font-size: 12.5px; color: var(--muted);
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6);
+  }
+  .float-card b{ color: var(--gold-light); display:block; font-size: 15px; margin-bottom: 2px; font-family:"Shippori Mincho",serif; }
+  .float-1{ top: 6%; left: -14%; animation: float 5s ease-in-out infinite; }
+  .float-2{ bottom: 8%; right: -12%; animation: float 5.5s ease-in-out infinite 0.6s; }
+  @keyframes float{ 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-10px);} }
+  @media (max-width: 940px){
+    .hero-grid{ grid-template-columns: 1fr; }
+    .phone-stage{ margin-top: 20px; }
+    .float-1, .float-2{ display:none; }
+  }
+
+  /* ---------- section shared ---------- */
+  .kicker{ font-size: 12.5px; letter-spacing: 0.22em; color: var(--gold-light); margin-bottom: 16px; }
+  .sec-title{ font-size: clamp(28px, 3.4vw, 42px); font-weight: 800; line-height: 1.4; }
+  .sec-title .thin{ color: var(--muted); font-weight: 500; }
+  .sec-lead{ color: var(--muted); font-size: 15.5px; margin-top: 16px; max-width: 620px; }
+  .band{ padding: 120px 0; }
+  .band.tight{ padding: 100px 0; }
+
+  /* ---------- problem ---------- */
+  .problem{ background: var(--bg-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .problem-grid{ margin-top: 56px; display:grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 18px; overflow:hidden; }
+  .problem-cell{ background: var(--bg-2); padding: 38px 32px; }
+  .problem-cell .q{ font-family:"Shippori Mincho",serif; font-size: 34px; color: rgba(201,161,92,0.45); margin-bottom: 18px; }
+  .problem-cell h3{ font-size: 16.5px; margin-bottom: 10px; font-weight: 700; }
+  .problem-cell p{ font-size: 13.5px; color: var(--muted); }
+  @media (max-width: 800px){ .problem-grid{ grid-template-columns: 1fr; } }
+
+  /* ---------- features ---------- */
+  .feat-list{ margin-top: 60px; display:flex; flex-direction:column; }
+  .feat-row{
+    display:grid; grid-template-columns: 90px 300px 1fr; gap: 30px; align-items:start;
+    padding: 34px 0; border-top: 1px solid var(--line);
+  }
+  .feat-list .feat-row:last-child{ border-bottom: 1px solid var(--line); }
+  .feat-num{ font-family:"Shippori Mincho",serif; font-size: 22px; color: var(--gold); }
+  .feat-name{ font-size: 19px; font-weight: 700; }
+  .feat-desc{ color: var(--muted); font-size: 14px; max-width: 560px; }
+  @media (max-width: 800px){
+    .feat-row{ grid-template-columns: 1fr; gap: 10px; }
+  }
+
+  /* ---------- flow / signature ---------- */
+  .flow{ background: var(--bg-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+  .flow-steps{ margin-top: 64px; display:grid; grid-template-columns: repeat(4,1fr); gap: 0; position: relative; }
+  .flow-steps::before{
+    content:""; position:absolute; top: 27px; left: 8%; right: 8%; height: 1px;
+    background: repeating-linear-gradient(90deg, rgba(201,161,92,0.4) 0 8px, transparent 8px 16px);
+  }
+  .flow-step{ text-align:center; padding: 0 14px; position:relative; }
+  .flow-dot{
+    width: 56px; height: 56px; border-radius: 50%; background: var(--bg);
+    border: 1px solid var(--gold); color: var(--gold-light); font-family:"Shippori Mincho",serif;
+    font-size: 20px; display:flex; align-items:center; justify-content:center; margin: 0 auto 22px; position: relative; z-index:2;
+  }
+  .flow-step h4{ font-size: 15px; margin-bottom: 8px; }
+  .flow-step p{ font-size: 12.5px; color: var(--muted); }
+  @media (max-width: 800px){
+    .flow-steps{ grid-template-columns: 1fr; gap: 34px; }
+    .flow-steps::before{ display:none; }
+  }
+
+  /* ---------- benefits ---------- */
+  .benefit-grid{ margin-top: 56px; display:grid; grid-template-columns: repeat(2,1fr); gap: 22px; }
+  .benefit-card{
+    background: var(--bg-3); border: 1px solid var(--line); border-radius: 16px; padding: 32px;
+    transition: border-color .25s ease, transform .25s ease;
+  }
+  .benefit-card:hover{ border-color: rgba(201,161,92,0.5); transform: translateY(-3px); }
+  .benefit-card h3{ font-size: 18px; color: var(--gold-light); margin-bottom: 12px; font-weight: 700; }
+  .benefit-card p{ font-size: 13.5px; color: var(--muted); }
+  @media (max-width: 800px){ .benefit-grid{ grid-template-columns: 1fr; } }
+
+  /* ---------- cta ---------- */
+  .cta{
+    text-align:center; padding: 130px 0;
+    background: radial-gradient(ellipse 700px 400px at 50% 0%, rgba(201,161,92,0.14), transparent 65%);
+  }
+  .cta h2{ font-size: clamp(30px,4vw,46px); font-weight: 800; line-height:1.5; }
+  .cta p{ color: var(--muted); margin-top: 18px; font-size: 15px; }
+  .cta .btn-primary{ margin-top: 38px; display:inline-flex; }
+
+  footer{ border-top: 1px solid var(--line); padding: 40px 0; }
+  .footer-row{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap: 16px; }
+  footer .logo{ font-size: 16px; }
+  footer small{ color: var(--muted-2); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<header>
+  <nav>
+    <div class="logo serif">ULTIMA</div>
+    <div class="nav-links">
+      <a href="#problem">課題</a>
+      <a href="#features">機能</a>
+      <a href="#flow">使い方</a>
+      <a href="#benefits">導入メリット</a>
+    </div>
+    <a href="#cta" class="nav-cta">資料請求</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">キャバクラ向け 総合店舗管理サービス</div>
+      <h1 class="serif">伝票と電卓、<br>そろそろ<span class="accent">卒業</span>しませんか。</h1>
+      <p class="lead">注文・売上・給料計算・出勤管理。バラバラだった夜の業務を、ひとつの画面に。スマホが使えれば、今日から始められます。</p>
+      <div class="hero-ctas">
+        <a href="#cta" class="btn-primary">資料をもらう</a>
+        <a href="#features" class="btn-ghost">できることを見る</a>
+      </div>
+      <div class="stat-row">
+        <div><div class="num">1</div><div class="lab">画面で完結</div></div>
+        <div><div class="num">0円</div><div class="lab">紙の伝票代</div></div>
+        <div><div class="num">自動</div><div class="lab">日次・月次締め</div></div>
+      </div>
+    </div>
+    <div class="phone-stage">
+      <div class="float-card float-1"><b>¥128,400</b>本日の売上</div>
+      <div class="float-card float-2"><b>指名 ⇄ フリー</b>自動で判定</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="qr-card"><div class="qr-mock"></div></div>
+          <div class="phone-line w80"></div>
+          <div class="phone-line w60"></div>
+          <div class="phone-line w40"></div>
+          <span class="phone-badge">3卓 ・ ご注文を送信しました</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="problem band tight" id="problem">
+  <div class="wrap">
+    <div class="kicker">こんなお悩み、ありませんか</div>
+    <h2 class="sec-title">毎晩の集計、<span class="thin">まだ手作業ですか。</span></h2>
+    <div class="problem-grid">
+      <div class="problem-cell">
+        <div class="q serif">壱</div>
+        <h3>閉店後の電卓作業</h3>
+        <p>伝票を1枚ずつ見返して、売上とバック率を手計算。閉店後1時間、2時間があっという間に過ぎていく。</p>
+      </div>
+      <div class="problem-cell">
+        <div class="q serif">弐</div>
+        <h3>紙とエクセルが別々</h3>
+        <p>伝票は紙、給料はエクセル、シフトはノート。情報がバラバラで、確認するだけでも一苦労。</p>
+      </div>
+      <div class="problem-cell">
+        <div class="q serif">参</div>
+        <h3>人手が足りない</h3>
+        <p>集計や事務作業に人手を割く余裕がない。本当は、もっと接客や売上づくりに時間を使いたい。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="features">
+  <div class="wrap">
+    <div class="kicker">システム構成</div>
+    <h2 class="sec-title">必要な機能を、<span class="thin">これ一本に。</span></h2>
+    <p class="sec-lead">複雑な操作は必要ありません。スマホひとつで、注文から給料計算まで完結します。</p>
+    <div class="feat-list">
+      <div class="feat-row">
+        <div class="feat-num serif">01</div>
+        <div class="feat-name">POSシステム</div>
+        <div class="feat-desc">QRコードを読み込むだけで注文完了。フリー／指名を自動で判定し、複数キャストが指名された場合も売上を自動で均等分配します。</div>
+      </div>
+      <div class="feat-row">
+        <div class="feat-num serif">02</div>
+        <div class="feat-name">日次集計 → 日次締め</div>
+        <div class="feat-desc">その日の売上・現金過不足を自動で計算。レジ金や日払いも、その場でスマホから入力できます。</div>
+      </div>
+      <div class="feat-row">
+        <div class="feat-num serif">03</div>
+        <div class="feat-name">月次集計 → 月次締め</div>
+        <div class="feat-desc">収入・支出を月単位で自動集計。総利益まで一目で把握でき、月末の締め作業がほぼ不要になります。</div>
+      </div>
+      <div class="feat-row">
+        <div class="feat-num serif">04</div>
+        <div class="feat-name">キャストごとの給料計算</div>
+        <div class="feat-desc">ドリンク・ボトル・指名料など項目別に、キャスト個人の売上とバック額を自動で振り分け。個別のバック率設定にも対応します。</div>
+      </div>
+      <div class="feat-row">
+        <div class="feat-num serif">05</div>
+        <div class="feat-name">出勤・退勤の打刻管理</div>
+        <div class="feat-desc">出勤・退勤ボタンをワンタップで打刻。勤務時間が自動で計算され、そのまま給料計算に連動します。</div>
+      </div>
+      <div class="feat-row">
+        <div class="feat-num serif">06</div>
+        <div class="feat-name">キャスト／スタッフの区分管理</div>
+        <div class="feat-desc">キャストとスタッフを分けて登録。出勤管理・給料計算の画面がそれぞれの働き方に合わせて完全に切り替わります。</div>
+      </div>
+      <div class="feat-row">
+        <div class="feat-num serif">07</div>
+        <div class="feat-name">在庫管理</div>
+        <div class="feat-desc">ボトル・シャンパンの在庫本数を自動で管理。注文が入るたびに本数が減算されます。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="flow band tight" id="flow">
+  <div class="wrap">
+    <div class="kicker">使い方はシンプル</div>
+    <h2 class="sec-title">注文から会計まで、<span class="thin">4ステップ。</span></h2>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-dot serif">1</div>
+        <h4>QRを読む</h4>
+        <p>お客様がテーブルのQRをスマホで読み込みます。</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-dot serif">2</div>
+        <h4>注文する</h4>
+        <p>フリー／指名を選んで、そのまま注文送信。</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-dot serif">3</div>
+        <h4>自動で集計</h4>
+        <p>売上はキャスト別・項目別に自動で振り分け。</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-dot serif">4</div>
+        <h4>会計・締め</h4>
+        <p>会計はワンタップ。日次・月次も自動で締まります。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="benefits">
+  <div class="wrap">
+    <div class="kicker">導入メリット</div>
+    <h2 class="sec-title">面倒な複雑を、<span class="thin">これ1本に。</span></h2>
+    <div class="benefit-grid">
+      <div class="benefit-card">
+        <h3>一元電子管理</h3>
+        <p>紙の伝票・電卓・エクセルで別々に管理していたものを、ひとつの画面にまとめます。</p>
+      </div>
+      <div class="benefit-card">
+        <h3>人手不足への予防策</h3>
+        <p>集計・給料計算をシステムが自動で行うため、少人数のスタッフでも運営が回ります。</p>
+      </div>
+      <div class="benefit-card">
+        <h3>売上向上に集中できる</h3>
+        <p>雑務の工程そのものを減らすことで、接客・売上づくりに時間を使えるようになります。</p>
+      </div>
+      <div class="benefit-card">
+        <h3>ミスとムラをなくす</h3>
+        <p>手計算によるバック率の間違いや、集計の抜け漏れがなくなります。</p>
+      </div>
+      <div class="benefit-card">
+        <h3>データが増えても軽いまま</h3>
+        <p>普段の動作は直近のデータだけを見るので、何年分蓄積しても動作が重くなりません。</p>
+      </div>
+      <div class="benefit-card">
+        <h3>何年前のデータもすぐ確認</h3>
+        <p>過去の伝票・売上・給料も、日付や月を選ぶだけでいつでも正確に呼び出せます。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="cta">
+  <div class="wrap">
+    <h2 class="serif">今日から、<br>もっとシンプルな店舗管理へ。</h2>
+    <p>難しい設定は必要ありません。パソコンが苦手なオーナー様でも、すぐにお使いいただけます。</p>
+    <a href="#" class="btn-primary">資料を請求する</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-row">
+    <div class="logo serif">ULTIMA</div>
+    <small>© ULTIMA — キャバクラ向け総合店舗管理サービス</small>
+  </div>
+</footer>
+
+</body>
+</html>
