@@ -1,314 +1,439 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ULTIMA | キャバクラ向け総合店舗管理サービス</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ULTIMA ― キャバクラ向け総合店舗管理サービス</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #15111a;
-    --bg-2: #1c1622;
-    --bg-3: #211a29;
-    --line: #322a3c;
-    --gold: #c9a15c;
-    --gold-light: #e3c888;
-    --text: #f2ede6;
-    --muted: #a99bb0;
-    --muted-2: #7b7186;
+    --bg: #050407;
+    --bg-2: #0c0a0f;
+    --panel: #16121a;
+    --panel-2: #1c1721;
+    --hairline: rgba(201,161,92,0.16);
+    --gold: #C9A15C;
+    --gold-light: #E8CD94;
+    --gold-dim: rgba(201,161,92,0.55);
+    --text: #F5F0E8;
+    --muted: #9C93A0;
+    --muted-2: #6B6472;
+    --serif: "Shippori Mincho", serif;
+    --sans: "Zen Kaku Gothic New", sans-serif;
   }
-  *{ box-sizing: border-box; margin: 0; padding: 0; }
+  *{ box-sizing: border-box; }
   html{ scroll-behavior: smooth; }
   body{
-    background: var(--bg);
-    color: var(--text);
-    font-family: "Zen Kaku Gothic New", sans-serif;
-    line-height: 1.75;
+    margin:0; background: var(--bg); color: var(--text);
+    font-family: var(--sans); -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
   }
-  .serif{ font-family: "Shippori Mincho", serif; }
   a{ color: inherit; text-decoration: none; }
-  img, svg{ display:block; max-width:100%; }
-
+  .serif{ font-family: var(--serif); }
   .wrap{ max-width: 1120px; margin: 0 auto; padding: 0 28px; }
-  section{ position: relative; }
+  .thin{ font-weight: 400; color: var(--muted); }
+  ::selection{ background: var(--gold); color: #1a1408; }
 
-  /* ---------- texture ---------- */
-  .grain{
-    position: fixed; inset: 0; pointer-events: none; z-index: 1;
-    opacity: 0.035; mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  @keyframes rise{ from{ opacity:0; transform: translateY(16px); } to{ opacity:1; transform: translateY(0); } }
+  @keyframes float{ 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-10px);} }
+  @keyframes glowPulse{ 0%,100%{ opacity:.55;} 50%{ opacity:1;} }
+
+  /* ---------- utility bar ---------- */
+  .utility{
+    background: #020202; border-bottom: 1px solid var(--hairline);
+    font-size: 12px; color: var(--muted-2);
   }
+  .utility .wrap{ display:flex; justify-content:flex-end; gap: 22px; padding-top:8px; padding-bottom:8px; }
+  .utility a:hover{ color: var(--gold-light); }
 
   /* ---------- nav ---------- */
-  header{
-    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
-    background: rgba(21,17,26,0.72);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(201,161,92,0.14);
+  header.nav{
+    position: sticky; top:0; z-index: 60;
+    background: rgba(5,4,7,0.86); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--hairline);
   }
-  nav{
-    display:flex; align-items:center; justify-content:space-between;
-    padding: 18px 28px; max-width: 1120px; margin: 0 auto;
+  .nav-row{ display:flex; align-items:center; justify-content:space-between; height: 74px; }
+  .logo{ font-family: var(--serif); font-weight:800; font-size: 21px; letter-spacing: 0.16em; color: var(--text); display:flex; align-items:center; gap:8px; }
+  .logo .dot{ width:6px; height:6px; border-radius:50%; background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+  nav.primary{ display:flex; align-items:center; gap: 34px; }
+  nav.primary > .navitem{ position:relative; }
+  nav.primary > .navitem > span{
+    font-size: 14px; color: var(--text); cursor:pointer; display:flex; align-items:center; gap:5px;
+    padding: 27px 0;
   }
-  .logo{ font-size: 20px; letter-spacing: 0.12em; color: var(--gold-light); font-weight: 600; }
-  .nav-links{ display:flex; gap: 36px; font-size: 13.5px; color: var(--muted); }
-  .nav-links a:hover{ color: var(--gold-light); }
-  .nav-cta{
-    border: 1px solid rgba(201,161,92,0.5); color: var(--gold-light);
-    padding: 9px 20px; border-radius: 999px; font-size: 13px; letter-spacing: 0.03em;
-    transition: all .2s ease;
+  nav.primary > .navitem > span:after{ content:"▾"; font-size:9px; color: var(--muted-2); transition: transform .2s; }
+  nav.primary > .navitem:hover > span:after{ transform: rotate(180deg); }
+  nav.primary > .navitem > span:hover{ color: var(--gold-light); }
+  .mega{
+    position:absolute; top: 100%; left: 50%; transform: translateX(-50%) translateY(6px);
+    width: 560px; background: var(--panel); border:1px solid var(--hairline); border-radius: 4px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.55);
+    padding: 26px; display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px;
+    opacity:0; visibility:hidden; transition: opacity .18s ease, transform .18s ease;
   }
-  .nav-cta:hover{ background: rgba(201,161,92,0.12); border-color: var(--gold); }
-  @media (max-width: 760px){ .nav-links{ display:none; } }
+  .navitem:hover .mega{ opacity:1; visibility:visible; transform: translateX(-50%) translateY(0); }
+  .mega-col h4{ font-size: 11px; letter-spacing:.1em; color: var(--gold); margin:0 0 10px; font-weight:700; }
+  .mega-col a{ display:block; font-size: 13px; color: var(--muted); padding: 6px 0; }
+  .mega-col a:hover{ color: var(--gold-light); }
+  .nav-cta{ display:flex; align-items:center; gap:14px; }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding: 11px 22px; border-radius: 3px; font-size: 13.5px; font-weight:700; cursor:pointer;
+    border:1px solid transparent; letter-spacing: .02em; transition: all .18s ease;
+  }
+  .btn-gold{ background: linear-gradient(180deg,var(--gold-light),var(--gold)); color:#1a1408; }
+  .btn-gold:hover{ filter: brightness(1.08); transform: translateY(-1px); }
+  .btn-line{ border-color: var(--hairline); color: var(--text); }
+  .btn-line:hover{ border-color: var(--gold-dim); color: var(--gold-light); }
+  .link-small{ font-size: 13.5px; color: var(--muted); }
+  .link-small:hover{ color: var(--gold-light); }
+  .burger{ display:none; }
 
   /* ---------- hero ---------- */
   .hero{
-    min-height: 100svh; display:flex; align-items:center;
-    padding-top: 110px; padding-bottom: 80px;
-    background:
-      radial-gradient(ellipse 900px 500px at 82% -6%, rgba(201,161,92,0.16), transparent 60%),
-      radial-gradient(ellipse 700px 500px at 10% 110%, rgba(201,161,92,0.08), transparent 60%);
+    position: relative; padding: 92px 0 84px; overflow:hidden;
+    background: radial-gradient(ellipse 900px 520px at 82% -10%, rgba(201,161,92,0.18), transparent 60%), var(--bg);
   }
-  .hero-grid{
-    display:grid; grid-template-columns: 1.15fr 0.85fr; gap: 60px; align-items:center;
-  }
-  .eyebrow{
-    display:inline-flex; align-items:center; gap: 10px;
-    font-size: 12.5px; letter-spacing: 0.22em; color: var(--gold-light);
-    margin-bottom: 26px; opacity: 0; animation: rise .8s ease forwards .1s;
-  }
-  .eyebrow::before{ content:""; width: 26px; height:1px; background: var(--gold); }
-  .hero h1{
-    font-size: clamp(40px, 5.6vw, 68px); font-weight: 800; line-height: 1.28;
-    letter-spacing: 0.01em;
-    opacity: 0; animation: rise .9s ease forwards .25s;
-  }
+  .hero-grid{ display:grid; grid-template-columns: 1.05fr 0.85fr; gap: 40px; align-items:center; }
+  .eyebrow{ display:inline-flex; align-items:center; gap:10px; font-size:12px; letter-spacing:.22em; color: var(--gold-light); margin-bottom:22px; opacity:0; animation: rise .8s ease forwards .1s; }
+  .eyebrow:before{ content:""; width:24px; height:1px; background: var(--gold); }
+  .hero h1{ font-family: var(--serif); font-size: clamp(34px,4.4vw,54px); line-height:1.32; font-weight:700; opacity:0; animation: rise .9s ease forwards .22s; }
   .hero h1 .accent{ color: var(--gold-light); }
-  .hero p.lead{
-    margin-top: 26px; font-size: 16.5px; color: var(--muted); max-width: 480px;
-    opacity: 0; animation: rise .9s ease forwards .45s;
-  }
-  .hero-ctas{
-    margin-top: 38px; display:flex; gap: 16px; flex-wrap: wrap;
-    opacity: 0; animation: rise .9s ease forwards .6s;
-  }
-  .btn-primary{
-    background: linear-gradient(135deg, var(--gold-light), var(--gold));
-    color: #201509; font-weight: 700; font-size: 14.5px;
-    padding: 15px 30px; border-radius: 999px; letter-spacing: 0.02em;
-    box-shadow: 0 12px 30px -12px rgba(201,161,92,0.55);
-    transition: transform .25s ease, box-shadow .25s ease;
-  }
-  .btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 16px 36px -12px rgba(201,161,92,0.7); }
-  .btn-ghost{
-    border: 1px solid var(--line); color: var(--text); font-size: 14.5px;
-    padding: 15px 26px; border-radius: 999px; transition: border-color .2s ease;
-  }
-  .btn-ghost:hover{ border-color: var(--gold); }
+  .hero p.lead{ margin-top:22px; font-size:15.5px; color: var(--muted); max-width:460px; opacity:0; animation: rise .9s ease forwards .38s; }
+  .hero-ctas{ margin-top:32px; display:flex; gap:14px; flex-wrap:wrap; opacity:0; animation: rise .9s ease forwards .52s; }
+  .stat-row{ margin-top:44px; opacity:0; animation: rise .9s ease forwards .68s; }
+  .stat-item{ display:inline-block; vertical-align:top; margin-right:36px; }
+  .stat-item .num{ font-family: var(--serif); font-size:26px; color: var(--gold-light); font-weight:600; display:block; }
+  .stat-item .lab{ font-size:11.5px; color: var(--muted-2); margin-top:3px; }
 
-  .stat-row{
-    margin-top: 56px; display:flex; gap: 44px; flex-wrap: wrap;
-    opacity: 0; animation: rise .9s ease forwards .78s;
-  }
-  .stat-row .num{ font-family:"Shippori Mincho",serif; font-size: 30px; color: var(--gold-light); font-weight: 600; }
-  .stat-row .lab{ font-size: 12px; color: var(--muted-2); margin-top: 4px; letter-spacing: 0.03em; }
-
-  @keyframes rise{ from{ opacity:0; transform: translateY(16px);} to{ opacity:1; transform: translateY(0);} }
-
-  /* phone mock */
-  .phone-stage{ position: relative; display:flex; justify-content:center; opacity:0; animation: rise 1s ease forwards .5s; }
+  .phone-stage{ position:relative; display:flex; justify-content:center; opacity:0; animation: rise 1s ease forwards .42s; }
   .phone{
-    width: 270px; border-radius: 34px; background: linear-gradient(160deg, #241c2c, #16111c);
-    border: 1px solid rgba(201,161,92,0.25);
-    padding: 16px 14px; box-shadow: 0 40px 80px -30px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.02) inset;
+    width: 260px; background: linear-gradient(180deg,#1b1622,#100c15); border-radius: 30px;
+    border: 1px solid var(--hairline); padding: 20px 16px; box-shadow: 0 40px 90px rgba(0,0,0,0.6);
+    animation: float 5.5s ease-in-out infinite;
   }
-  .phone-notch{ width: 60px; height: 5px; background: rgba(255,255,255,0.08); border-radius: 4px; margin: 0 auto 14px; }
-  .phone-screen{
-    background: var(--bg-2); border-radius: 20px; padding: 20px 16px 22px;
-    border: 1px solid var(--line);
-  }
-  .qr-card{
-    background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .qr-mock{
-    width: 130px; height: 130px; background:
-      repeating-linear-gradient(0deg,#15111a 0 6px, transparent 6px 12px),
-      repeating-linear-gradient(90deg,#15111a 0 6px, transparent 6px 12px);
-    background-blend-mode: multiply; opacity: 0.9;
-  }
-  .phone-line{ height: 8px; background: var(--line); border-radius: 4px; margin-bottom: 10px; }
-  .phone-line.w60{ width: 60%; }
-  .phone-line.w80{ width: 80%; }
-  .phone-line.w40{ width: 40%; background: var(--gold); opacity:.5; }
-  .phone-badge{
-    display:inline-block; margin-top: 14px; font-size: 11px; color: var(--gold-light);
-    border: 1px solid rgba(201,161,92,0.4); padding: 5px 12px; border-radius: 999px;
-  }
-  .float-card{
-    position:absolute; background: var(--bg-3); border:1px solid var(--line);
-    border-radius: 14px; padding: 14px 18px; font-size: 12.5px; color: var(--muted);
-    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6);
-  }
-  .float-card b{ color: var(--gold-light); display:block; font-size: 15px; margin-bottom: 2px; font-family:"Shippori Mincho",serif; }
-  .float-1{ top: 6%; left: -14%; animation: float 5s ease-in-out infinite; }
-  .float-2{ bottom: 8%; right: -12%; animation: float 5.5s ease-in-out infinite 0.6s; }
-  @keyframes float{ 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-10px);} }
-  @media (max-width: 940px){
-    .hero-grid{ grid-template-columns: 1fr; }
-    .phone-stage{ margin-top: 20px; }
-    .float-1, .float-2{ display:none; }
-  }
+  .phone .notch{ width:44px; height:4px; border-radius:3px; background:#332c3c; margin:0 auto 16px; }
+  .phone-screen{ background:#fff; border-radius:8px; height:150px; margin-bottom:14px; overflow:hidden; position:relative; }
+  .phone-screen .bar{ height:22px; background:#0c0a0f; }
+  .phone-screen .row{ height:16px; background:#eee3cf; margin:10px 12px; border-radius:3px; }
+  .phone-screen .row.short{ width:55%; background: var(--gold); }
+  .phone-line{ height:9px; border-radius:4px; background: rgba(255,255,255,0.08); margin-bottom:9px; }
+  .phone-line.w80{ width:80%;} .phone-line.w60{ width:60%; } .phone-line.w40{ width:40%; }
+  .phone-badge{ display:inline-block; margin-top:8px; font-size:10.5px; padding:6px 10px; border-radius:20px; border:1px solid var(--gold-dim); color: var(--gold-light); }
+  .ring{ position:absolute; border-radius:50%; border:1px solid var(--hairline); animation: glowPulse 4s ease-in-out infinite; }
+  .ring.r1{ width:340px; height:340px; top:-40px; left:50%; transform:translateX(-50%); }
+  .ring.r2{ width:420px; height:420px; top:-80px; left:50%; transform:translateX(-50%); animation-delay: 1.2s; }
 
-  /* ---------- section shared ---------- */
-  .kicker{ font-size: 12.5px; letter-spacing: 0.22em; color: var(--gold-light); margin-bottom: 16px; }
-  .sec-title{ font-size: clamp(28px, 3.4vw, 42px); font-weight: 800; line-height: 1.4; }
-  .sec-title .thin{ color: var(--muted); font-weight: 500; }
-  .sec-lead{ color: var(--muted); font-size: 15.5px; margin-top: 16px; max-width: 620px; }
-  .band{ padding: 120px 0; }
-  .band.tight{ padding: 100px 0; }
+  /* ---------- section shells ---------- */
+  section{ position:relative; }
+  .band{ padding: 78px 0; border-top:1px solid var(--hairline); }
+  .band.tight{ padding: 66px 0; }
+  .kicker{ font-size:11.5px; letter-spacing:.2em; color: var(--gold); margin-bottom:14px; }
+  .sec-title{ font-family: var(--serif); font-size: clamp(24px,3vw,32px); font-weight:700; margin:0 0 14px; }
+  .sec-sub{ color: var(--muted); font-size:14.5px; max-width:560px; margin:0 0 40px; }
 
-  /* ---------- problem ---------- */
-  .problem{ background: var(--bg-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-  .problem-grid{ margin-top: 56px; display:grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 18px; overflow:hidden; }
-  .problem-cell{ background: var(--bg-2); padding: 38px 32px; }
-  .problem-cell .q{ font-family:"Shippori Mincho",serif; font-size: 34px; color: rgba(201,161,92,0.45); margin-bottom: 18px; }
-  .problem-cell h3{ font-size: 16.5px; margin-bottom: 10px; font-weight: 700; }
-  .problem-cell p{ font-size: 13.5px; color: var(--muted); }
-  @media (max-width: 800px){ .problem-grid{ grid-template-columns: 1fr; } }
+  /* promo cards */
+  .promo-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .promo-card{
+    display:flex; align-items:center; gap:16px; background: var(--panel); border:1px solid var(--hairline);
+    border-radius:4px; padding:20px; transition: border-color .18s ease, transform .18s ease;
+  }
+  .promo-card:hover{ border-color: var(--gold-dim); transform: translateY(-2px); }
+  .promo-icon{ width:44px; height:44px; border-radius:50%; background: rgba(201,161,92,0.12); display:flex; align-items:center; justify-content:center; color: var(--gold-light); font-family: var(--serif); font-weight:700; font-size:15px; flex-shrink:0; }
+  .promo-card h4{ margin:0 0 4px; font-size:14.5px; }
+  .promo-card p{ margin:0; font-size:12.5px; color: var(--muted); }
 
-  /* ---------- features ---------- */
-  .feat-list{ margin-top: 60px; display:flex; flex-direction:column; }
-  .feat-row{
-    display:grid; grid-template-columns: 90px 300px 1fr; gap: 30px; align-items:start;
-    padding: 34px 0; border-top: 1px solid var(--line);
-  }
-  .feat-list .feat-row:last-child{ border-bottom: 1px solid var(--line); }
-  .feat-num{ font-family:"Shippori Mincho",serif; font-size: 22px; color: var(--gold); }
-  .feat-name{ font-size: 19px; font-weight: 700; }
-  .feat-desc{ color: var(--muted); font-size: 14px; max-width: 560px; }
-  @media (max-width: 800px){
-    .feat-row{ grid-template-columns: 1fr; gap: 10px; }
-  }
+  /* venue type cards */
+  .venue-grid{ display:grid; grid-template-columns: repeat(4,1fr); gap:16px; }
+  .venue-card{ position:relative; border-radius:4px; overflow:hidden; aspect-ratio: 3/3.6; border:1px solid var(--hairline); }
+  .venue-card .bgshape{ position:absolute; inset:0; background: linear-gradient(155deg, #241c2b, #0c0a0f 70%); }
+  .venue-card .bgshape:after{ content:""; position:absolute; right:-30%; top:-20%; width:70%; height:70%; border-radius:50%; background: radial-gradient(circle, rgba(201,161,92,0.25), transparent 65%); }
+  .venue-card .inner{ position:relative; height:100%; display:flex; flex-direction:column; justify-content:flex-end; padding:18px; }
+  .venue-card h4{ font-family: var(--serif); font-size:16px; margin:0 0 6px; }
+  .venue-card span.tag{ font-size:11px; color: var(--gold-light); }
 
-  /* ---------- flow / signature ---------- */
-  .flow{ background: var(--bg-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
-  .flow-steps{ margin-top: 64px; display:grid; grid-template-columns: repeat(4,1fr); gap: 0; position: relative; }
-  .flow-steps::before{
-    content:""; position:absolute; top: 27px; left: 8%; right: 8%; height: 1px;
-    background: repeating-linear-gradient(90deg, rgba(201,161,92,0.4) 0 8px, transparent 8px 16px);
-  }
-  .flow-step{ text-align:center; padding: 0 14px; position:relative; }
-  .flow-dot{
-    width: 56px; height: 56px; border-radius: 50%; background: var(--bg);
-    border: 1px solid var(--gold); color: var(--gold-light); font-family:"Shippori Mincho",serif;
-    font-size: 20px; display:flex; align-items:center; justify-content:center; margin: 0 auto 22px; position: relative; z-index:2;
-  }
-  .flow-step h4{ font-size: 15px; margin-bottom: 8px; }
-  .flow-step p{ font-size: 12.5px; color: var(--muted); }
-  @media (max-width: 800px){
-    .flow-steps{ grid-template-columns: 1fr; gap: 34px; }
-    .flow-steps::before{ display:none; }
-  }
+  /* numbered deep-dive rows */
+  .deep{ display:grid; grid-template-columns: 0.9fr 1.1fr; gap:56px; align-items:center; padding: 56px 0; }
+  .deep:nth-child(even){ grid-template-columns: 1.1fr 0.9fr; }
+  .deep:nth-child(even) .deep-visual{ order:2; }
+  .deep-num{ font-family: var(--serif); font-size:78px; color: rgba(201,161,92,0.14); font-weight:800; line-height:1; margin-bottom:6px; }
+  .deep h3{ font-family: var(--serif); font-size:24px; margin:0 0 14px; }
+  .deep p.desc{ color: var(--muted); font-size:14.5px; margin:0 0 20px; max-width:440px; }
+  .checklist{ list-style:none; padding:0; margin:0; display:grid; gap:10px; }
+  .checklist li{ display:flex; align-items:flex-start; gap:10px; font-size:13.5px; color: var(--text); }
+  .checklist li:before{ content:"✓"; color: var(--gold); font-weight:700; flex-shrink:0; margin-top:1px; }
+  .deep-visual{ background: var(--panel); border:1px solid var(--hairline); border-radius:6px; padding:28px; min-height:230px; display:flex; align-items:center; justify-content:center; }
 
-  /* ---------- benefits ---------- */
-  .benefit-grid{ margin-top: 56px; display:grid; grid-template-columns: repeat(2,1fr); gap: 22px; }
-  .benefit-card{
-    background: var(--bg-3); border: 1px solid var(--line); border-radius: 16px; padding: 32px;
-    transition: border-color .25s ease, transform .25s ease;
-  }
-  .benefit-card:hover{ border-color: rgba(201,161,92,0.5); transform: translateY(-3px); }
-  .benefit-card h3{ font-size: 18px; color: var(--gold-light); margin-bottom: 12px; font-weight: 700; }
-  .benefit-card p{ font-size: 13.5px; color: var(--muted); }
-  @media (max-width: 800px){ .benefit-grid{ grid-template-columns: 1fr; } }
+  /* feature grid */
+  .feat-grid{ display:grid; grid-template-columns: repeat(4,1fr); gap:1px; background: var(--hairline); border:1px solid var(--hairline); border-radius:4px; overflow:hidden; }
+  .feat-cell{ background: var(--bg-2); padding: 26px 20px; transition: background .18s ease; }
+  .feat-cell:hover{ background: var(--panel); }
+  .feat-cell .ico{ width:34px; height:34px; margin-bottom:14px; }
+  .feat-cell h4{ font-size:14px; margin:0 0 6px; }
+  .feat-cell p{ font-size:12px; color: var(--muted); margin:0; line-height:1.6; }
 
-  /* ---------- cta ---------- */
-  .cta{
-    text-align:center; padding: 130px 0;
-    background: radial-gradient(ellipse 700px 400px at 50% 0%, rgba(201,161,92,0.14), transparent 65%);
-  }
-  .cta h2{ font-size: clamp(30px,4vw,46px); font-weight: 800; line-height:1.5; }
-  .cta p{ color: var(--muted); margin-top: 18px; font-size: 15px; }
-  .cta .btn-primary{ margin-top: 38px; display:inline-flex; }
+  /* contact cards */
+  .contact-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:18px; }
+  .contact-card{ background: var(--panel); border:1px solid var(--hairline); border-radius:6px; padding:28px 24px; text-align:center; }
+  .contact-card .tagline{ display:inline-block; font-size:10.5px; letter-spacing:.12em; color: var(--gold); border:1px solid var(--gold-dim); border-radius:20px; padding:4px 12px; margin-bottom:14px; }
+  .contact-card h4{ font-family: var(--serif); font-size:18px; margin:0 0 10px; }
+  .contact-card p{ font-size:12.5px; color: var(--muted); margin:0 0 18px; line-height:1.7; }
 
-  footer{ border-top: 1px solid var(--line); padding: 40px 0; }
-  .footer-row{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap: 16px; }
-  footer .logo{ font-size: 16px; }
-  footer small{ color: var(--muted-2); font-size: 12px; }
+  /* FAQ */
+  .faq{ border-top:1px solid var(--hairline); }
+  .faq-item{ border-bottom:1px solid var(--hairline); }
+  .faq-q{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:22px 4px; cursor:pointer; }
+  .faq-q span.qmark{ font-family: var(--serif); color: var(--gold); font-size:15px; flex-shrink:0; }
+  .faq-q p{ margin:0; font-size:14.5px; flex:1; }
+  .faq-q .plus{ font-size:18px; color: var(--muted-2); transition: transform .2s ease; flex-shrink:0; }
+  .faq-item.open .plus{ transform: rotate(45deg); color: var(--gold); }
+  .faq-a{ max-height:0; overflow:hidden; transition: max-height .25s ease; }
+  .faq-item.open .faq-a{ max-height:200px; }
+  .faq-a p{ margin:0 0 20px; padding-left:26px; font-size:13.5px; color: var(--muted); line-height:1.8; }
+
+  /* support band */
+  .support-row{ display:grid; grid-template-columns: 0.9fr 1.1fr; gap:48px; align-items:center; background: var(--panel); border:1px solid var(--hairline); border-radius:6px; padding:40px; }
+  .avatar-row{ display:flex; }
+  .avatar{ width:56px; height:56px; border-radius:50%; background: linear-gradient(160deg,#3a3040,#1c1722); border:2px solid var(--bg); margin-left:-14px; display:flex; align-items:center; justify-content:center; font-family:var(--serif); color:var(--gold-light); font-size:15px; }
+  .avatar:first-child{ margin-left:0; }
+
+  /* closing CTA (reuse style) */
+  .closing{ padding:96px 0; text-align:center; position:relative; background: radial-gradient(circle at 50% 40%, rgba(201,161,92,0.16), transparent 60%); }
+  .closing h2{ font-family: var(--serif); font-size: clamp(24px,3.4vw,34px); margin:0 0 14px; }
+  .closing p{ color: var(--muted); margin:0 0 30px; }
+
+  footer{ border-top:1px solid var(--hairline); padding: 40px 0; }
+  .footer-row{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+  .footer-links{ display:flex; gap:22px; font-size:12.5px; color: var(--muted-2); flex-wrap:wrap; }
+  .footer-links a:hover{ color: var(--gold-light); }
+
+  /* scroll-to-top */
+  .totop{
+    position:fixed; right:22px; bottom:22px; width:44px; height:44px; border-radius:50%;
+    background: var(--panel); border:1px solid var(--hairline); display:flex; align-items:center; justify-content:center;
+    color: var(--gold-light); cursor:pointer; z-index:50; opacity:0; pointer-events:none; transition: opacity .2s ease;
+  }
+  .totop.show{ opacity:1; pointer-events:auto; }
+
+  @media (max-width: 860px){
+    nav.primary, .nav-cta .link-small, .utility{ display:none; }
+    .nav-cta .btn-gold{ padding: 9px 16px; font-size:12.5px; }
+    .hero-grid{ grid-template-columns:1fr; }
+    .phone-stage{ order:-1; margin-bottom: 10px; }
+    .promo-grid, .venue-grid, .contact-grid{ grid-template-columns: 1fr 1fr; }
+    .feat-grid{ grid-template-columns: repeat(2,1fr); }
+    .deep, .deep:nth-child(even){ grid-template-columns:1fr; }
+    .deep:nth-child(even) .deep-visual{ order:0; }
+    .support-row{ grid-template-columns:1fr; padding:28px; }
+  }
+  @media (max-width: 520px){
+    .promo-grid, .venue-grid, .contact-grid, .feat-grid{ grid-template-columns: 1fr; }
+    .wrap{ padding:0 18px; }
+  }
 </style>
 </head>
 <body>
-<div class="grain"></div>
 
-<header>
-  <nav>
-    <div class="logo serif">ULTIMA</div>
-    <div class="nav-links">
-      <a href="#problem">課題</a>
-      <a href="#features">機能</a>
-      <a href="#flow">使い方</a>
-      <a href="#benefits">導入メリット</a>
+<div class="utility">
+  <div class="wrap">
+    <a href="#faq">よくあるご質問</a>
+    <a href="#contact">サポート</a>
+    <a href="#contact">お問い合わせ</a>
+  </div>
+</div>
+
+<header class="nav">
+  <div class="wrap nav-row">
+    <a class="logo" href="#top"><span class="dot"></span>ULTIMA</a>
+    <nav class="primary">
+      <div class="navitem">
+        <span>機能</span>
+        <div class="mega">
+          <div class="mega-col">
+            <h4>接客・注文</h4>
+            <a href="#features">POSシステム</a>
+            <a href="#features">場内・本指名管理</a>
+            <a href="#features">在庫管理</a>
+          </div>
+          <div class="mega-col">
+            <h4>集計・給料</h4>
+            <a href="#features">日次・月次集計</a>
+            <a href="#features">キャストごとの給料計算</a>
+            <a href="#features">バック率設定</a>
+          </div>
+          <div class="mega-col">
+            <h4>人員管理</h4>
+            <a href="#features">出勤・退勤打刻</a>
+            <a href="#features">キャスト／スタッフ区分</a>
+            <a href="#features">シフト管理</a>
+          </div>
+        </div>
+      </div>
+      <div class="navitem">
+        <span>導入について</span>
+        <div class="mega" style="width:380px; grid-template-columns:1fr 1fr;">
+          <div class="mega-col">
+            <h4>はじめる</h4>
+            <a href="#flow">導入までの流れ</a>
+            <a href="#pricing">料金プラン</a>
+          </div>
+          <div class="mega-col">
+            <h4>サポート</h4>
+            <a href="#support">導入後サポート</a>
+            <a href="#faq">よくあるご質問</a>
+          </div>
+        </div>
+      </div>
+      <a class="link-small" href="#venues">対応業態</a>
+      <a class="link-small" href="#faq">よくあるご質問</a>
+      <a class="link-small" href="#contact">お問い合わせ</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="link-small" href="#contact">ログイン</a>
+      <a class="btn btn-line" href="#contact">資料請求</a>
+      <a class="btn btn-gold" href="#contact">無料相談</a>
     </div>
-    <a href="#cta" class="nav-cta">資料請求</a>
-  </nav>
+  </div>
 </header>
 
-<section class="hero">
+<section class="hero" id="top">
   <div class="wrap hero-grid">
     <div>
-      <div class="eyebrow">キャバクラ向け 総合店舗管理サービス</div>
-      <h1 class="serif">伝票と電卓、<br>そろそろ<span class="accent">卒業</span>しませんか。</h1>
+      <div class="eyebrow">キャバクラ向け総合店舗管理サービス</div>
+      <h1>伝票と電卓、<br>そろそろ<span class="accent">卒業</span>しませんか。</h1>
       <p class="lead">注文・売上・給料計算・出勤管理。バラバラだった夜の業務を、ひとつの画面に。スマホが使えれば、今日から始められます。</p>
       <div class="hero-ctas">
-        <a href="#cta" class="btn-primary">資料をもらう</a>
-        <a href="#features" class="btn-ghost">できることを見る</a>
+        <a class="btn btn-gold" href="#contact">資料をもらう</a>
+        <a class="btn btn-line" href="#features">できることを見る</a>
       </div>
       <div class="stat-row">
-        <div><div class="num">1</div><div class="lab">画面で完結</div></div>
-        <div><div class="num">0円</div><div class="lab">紙の伝票代</div></div>
-        <div><div class="num">自動</div><div class="lab">日次・月次締め</div></div>
+        <div class="stat-item"><span class="num">1</span><span class="lab">画面で完結</span></div>
+        <div class="stat-item"><span class="num">0円</span><span class="lab">紙の伝票代</span></div>
+        <div class="stat-item"><span class="num">自動</span><span class="lab">日次・月次締め</span></div>
       </div>
     </div>
     <div class="phone-stage">
-      <div class="float-card float-1"><b>¥128,400</b>本日の売上</div>
-      <div class="float-card float-2"><b>指名 ⇄ フリー</b>自動で判定</div>
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
       <div class="phone">
-        <div class="phone-notch"></div>
+        <div class="notch"></div>
         <div class="phone-screen">
-          <div class="qr-card"><div class="qr-mock"></div></div>
-          <div class="phone-line w80"></div>
-          <div class="phone-line w60"></div>
-          <div class="phone-line w40"></div>
-          <span class="phone-badge">3卓 ・ ご注文を送信しました</span>
+          <div class="bar"></div>
+          <div class="row"></div>
+          <div class="row"></div>
+          <div class="row short"></div>
         </div>
+        <div class="phone-line w80"></div>
+        <div class="phone-line w60"></div>
+        <div class="phone-line w40"></div>
+        <span class="phone-badge">8卓 ・ ご注文を送信しました</span>
       </div>
     </div>
   </div>
 </section>
 
-<section class="problem band tight" id="problem">
+<section class="band tight" id="promo">
+  <div class="wrap promo-grid">
+    <div class="promo-card">
+      <div class="promo-icon serif">早</div>
+      <div>
+        <h4>最短3日で稼働開始</h4>
+        <p>難しい設定は不要。専用端末（iPad）込みで、届いたその日から使い始められます。</p>
+      </div>
+    </div>
+    <div class="promo-card">
+      <div class="promo-icon serif">定</div>
+      <div>
+        <h4>料金はシンプルな定額制</h4>
+        <p>初期費用・月額ともに追加費用なし。何店舗運営しても、迷わない料金体系です。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="venues">
   <div class="wrap">
-    <div class="kicker">こんなお悩み、ありませんか</div>
-    <h2 class="sec-title">毎晩の集計、<span class="thin">まだ手作業ですか。</span></h2>
-    <div class="problem-grid">
-      <div class="problem-cell">
-        <div class="q serif">壱</div>
-        <h3>閉店後の電卓作業</h3>
-        <p>伝票を1枚ずつ見返して、売上とバック率を手計算。閉店後1時間、2時間があっという間に過ぎていく。</p>
+    <div class="kicker">対応業態</div>
+    <h2 class="sec-title">夜の接客業、<span class="thin">どの業態にも。</span></h2>
+    <p class="sec-sub">指名・場内指名・セット料金・同伴といった、夜の接客業特有の商習慣にあわせて設計しています。</p>
+    <div class="venue-grid">
+      <div class="venue-card"><div class="bgshape"></div><div class="inner"><span class="tag">01</span><h4>キャバクラ</h4></div></div>
+      <div class="venue-card"><div class="bgshape"></div><div class="inner"><span class="tag">02</span><h4>ラウンジ</h4></div></div>
+      <div class="venue-card"><div class="bgshape"></div><div class="inner"><span class="tag">03</span><h4>クラブ</h4></div></div>
+      <div class="venue-card"><div class="bgshape"></div><div class="inner"><span class="tag">04</span><h4>スナック</h4></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="reasons" style="border-top:1px solid var(--hairline); background: var(--bg-2);">
+  <div class="wrap">
+    <div class="kicker">選ばれる理由</div>
+    <h2 class="sec-title">お店の「困った」を、<span class="thin">まるごと解決。</span></h2>
+
+    <div class="deep">
+      <div>
+        <div class="deep-num">01</div>
+        <h3>複雑な商習慣にも、はじめから対応</h3>
+        <p class="desc">フリー・指名・場内指名・同伴。複数キャストにまたがる売上も自動で均等に分配し、あとから手計算し直す必要がありません。</p>
+        <ul class="checklist">
+          <li>複数指名の売上を自動で人数分配</li>
+          <li>キャストごとのバック率を個別設定</li>
+          <li>セット料金・場内指名料もワンタップ入力</li>
+        </ul>
       </div>
-      <div class="problem-cell">
-        <div class="q serif">弐</div>
-        <h3>紙とエクセルが別々</h3>
-        <p>伝票は紙、給料はエクセル、シフトはノート。情報がバラバラで、確認するだけでも一苦労。</p>
+      <div class="deep-visual">
+        <svg width="100%" height="180" viewBox="0 0 320 180">
+          <circle cx="120" cy="90" r="60" fill="none" stroke="#3a3040" stroke-width="1"/>
+          <circle cx="200" cy="90" r="60" fill="none" stroke="#3a3040" stroke-width="1"/>
+          <circle cx="160" cy="90" r="60" fill="rgba(201,161,92,0.14)" stroke="#C9A15C" stroke-width="1.2"/>
+          <text x="160" y="96" text-anchor="middle" fill="#E8CD94" font-family="Shippori Mincho" font-size="15">1/2 ずつ</text>
+        </svg>
       </div>
-      <div class="problem-cell">
-        <div class="q serif">参</div>
-        <h3>人手が足りない</h3>
-        <p>集計や事務作業に人手を割く余裕がない。本当は、もっと接客や売上づくりに時間を使いたい。</p>
+    </div>
+
+    <div class="deep">
+      <div>
+        <div class="deep-num">02</div>
+        <h3>閉店後の集計作業を、ほぼゼロに</h3>
+        <p class="desc">会計するたびに、日次・月次の売上が自動で積み上がっていきます。レジ金と現金売上の突き合わせも、その場で終わります。</p>
+        <ul class="checklist">
+          <li>会計と同時に売上を自動集計</li>
+          <li>現金過不足をその場でチェック</li>
+          <li>月次の収支・総利益まで自動で表示</li>
+        </ul>
+      </div>
+      <div class="deep-visual">
+        <svg width="100%" height="180" viewBox="0 0 320 180">
+          <g stroke="#3a3040" stroke-width="1">
+            <line x1="30" y1="150" x2="290" y2="150"/>
+          </g>
+          <rect x="55" y="110" width="26" height="40" fill="#5C4A2A"/>
+          <rect x="105" y="90" width="26" height="60" fill="#8A6B36"/>
+          <rect x="155" y="60" width="26" height="90" fill="#C9A15C"/>
+          <rect x="205" y="40" width="26" height="110" fill="#E8CD94"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="deep">
+      <div>
+        <div class="deep-num">03</div>
+        <h3>キャストの給料も、その場で確定</h3>
+        <p class="desc">ドリンク・ボトル・指名料など、項目ごとに自動で振り分け。キャストは自分のスマホから、いつでも実績を確認できます。</p>
+        <ul class="checklist">
+          <li>項目別の売上・バック額を自動計算</li>
+          <li>出勤・退勤の打刻から労働時間も自動反映</li>
+          <li>キャストとスタッフで給料計算画面を分離</li>
+        </ul>
+      </div>
+      <div class="deep-visual">
+        <svg width="100%" height="180" viewBox="0 0 320 180">
+          <circle cx="160" cy="90" r="58" fill="none" stroke="#C9A15C" stroke-width="1.4" stroke-dasharray="4 5"/>
+          <text x="160" y="80" text-anchor="middle" fill="#E8CD94" font-family="Shippori Mincho" font-weight="700" font-size="22">¥</text>
+          <text x="160" y="106" text-anchor="middle" fill="#9C93A0" font-size="11">自動計算</text>
+        </svg>
       </div>
     </div>
   </div>
@@ -316,125 +441,194 @@
 
 <section class="band" id="features">
   <div class="wrap">
-    <div class="kicker">システム構成</div>
+    <div class="kicker">主な機能</div>
     <h2 class="sec-title">必要な機能を、<span class="thin">これ一本に。</span></h2>
-    <p class="sec-lead">複雑な操作は必要ありません。スマホひとつで、注文から給料計算まで完結します。</p>
-    <div class="feat-list">
-      <div class="feat-row">
-        <div class="feat-num serif">01</div>
-        <div class="feat-name">POSシステム</div>
-        <div class="feat-desc">QRコードを読み込むだけで注文完了。フリー／指名を自動で判定し、複数キャストが指名された場合も売上を自動で均等分配します。</div>
+    <p class="sec-sub">複雑な操作は必要ありません。スマホひとつで、注文から給料計算まで完結します。</p>
+    <div class="feat-grid">
+      <div class="feat-cell">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2" stroke="#C9A15C" stroke-width="1.3"/><path d="M8 8h8M8 12h8M8 16h5" stroke="#C9A15C" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <h4>POSシステム</h4>
+        <p>QRコードで注文完了。複数キャストへの均等分配にも対応。</p>
       </div>
-      <div class="feat-row">
-        <div class="feat-num serif">02</div>
-        <div class="feat-name">日次集計 → 日次締め</div>
-        <div class="feat-desc">その日の売上・現金過不足を自動で計算。レジ金や日払いも、その場でスマホから入力できます。</div>
+      <div class="feat-cell">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M4 19V9m5 10V5m5 14v-8m5 8v-3" stroke="#C9A15C" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <h4>日次・月次集計</h4>
+        <p>売上・現金過不足を自動計算。締め作業がほぼ不要に。</p>
       </div>
-      <div class="feat-row">
-        <div class="feat-num serif">03</div>
-        <div class="feat-name">月次集計 → 月次締め</div>
-        <div class="feat-desc">収入・支出を月単位で自動集計。総利益まで一目で把握でき、月末の締め作業がほぼ不要になります。</div>
+      <div class="feat-cell">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#C9A15C" stroke-width="1.3"/><path d="M12 8v4l3 2" stroke="#C9A15C" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <h4>出勤・退勤打刻</h4>
+        <p>ワンタップで打刻。労働時間が自動で給料計算に連動。</p>
       </div>
-      <div class="feat-row">
-        <div class="feat-num serif">04</div>
-        <div class="feat-name">キャストごとの給料計算</div>
-        <div class="feat-desc">ドリンク・ボトル・指名料など項目別に、キャスト個人の売上とバック額を自動で振り分け。個別のバック率設定にも対応します。</div>
+      <div class="feat-cell">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18" stroke="#C9A15C" stroke-width="1.3" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="#C9A15C" stroke-width="1.3"/></svg>
+        <h4>キャストごとの給料計算</h4>
+        <p>項目別の売上とバック額を自動振り分け、個別バック率にも対応。</p>
       </div>
-      <div class="feat-row">
-        <div class="feat-num serif">05</div>
-        <div class="feat-name">出勤・退勤の打刻管理</div>
-        <div class="feat-desc">出勤・退勤ボタンをワンタップで打刻。勤務時間が自動で計算され、そのまま給料計算に連動します。</div>
+      <div class="feat-cell">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M5 8l7-5 7 5v11a1 1 0 01-1 1h-4v-6H10v6H6a1 1 0 01-1-1V8z" stroke="#C9A15C" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        <h4>キャスト／スタッフ区分</h4>
+        <p>働き方に合わせて出勤管理・給料計算の画面を完全に分離。</p>
       </div>
-      <div class="feat-row">
-        <div class="feat-num serif">06</div>
-        <div class="feat-name">キャスト／スタッフの区分管理</div>
-        <div class="feat-desc">キャストとスタッフを分けて登録。出勤管理・給料計算の画面がそれぞれの働き方に合わせて完全に切り替わります。</div>
+      <div class="feat-cell">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="13" rx="1.5" stroke="#C9A15C" stroke-width="1.3"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" stroke="#C9A15C" stroke-width="1.3"/></svg>
+        <h4>在庫管理</h4>
+        <p>ボトル・シャンパンの本数を自動管理。注文と連動して減算。</p>
       </div>
-      <div class="feat-row">
-        <div class="feat-num serif">07</div>
-        <div class="feat-name">在庫管理</div>
-        <div class="feat-desc">ボトル・シャンパンの在庫本数を自動で管理。注文が入るたびに本数が減算されます。</div>
+      <div class="feat-cell">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M12 21c4-4 7-7.58 7-11a7 7 0 10-14 0c0 3.42 3 7 7 11z" stroke="#C9A15C" stroke-width="1.3"/><circle cx="12" cy="10" r="2.4" stroke="#C9A15C" stroke-width="1.3"/></svg>
+        <h4>卓・QRコード管理</h4>
+        <p>卓ごとにタイムスタンプ・指名者・料金をリアルタイムに表示。</p>
       </div>
-    </div>
-  </div>
-</section>
-
-<section class="flow band tight" id="flow">
-  <div class="wrap">
-    <div class="kicker">使い方はシンプル</div>
-    <h2 class="sec-title">注文から会計まで、<span class="thin">4ステップ。</span></h2>
-    <div class="flow-steps">
-      <div class="flow-step">
-        <div class="flow-dot serif">1</div>
-        <h4>QRを読む</h4>
-        <p>お客様がテーブルのQRをスマホで読み込みます。</p>
-      </div>
-      <div class="flow-step">
-        <div class="flow-dot serif">2</div>
-        <h4>注文する</h4>
-        <p>フリー／指名を選んで、そのまま注文送信。</p>
-      </div>
-      <div class="flow-step">
-        <div class="flow-dot serif">3</div>
-        <h4>自動で集計</h4>
-        <p>売上はキャスト別・項目別に自動で振り分け。</p>
-      </div>
-      <div class="flow-step">
-        <div class="flow-dot serif">4</div>
-        <h4>会計・締め</h4>
-        <p>会計はワンタップ。日次・月次も自動で締まります。</p>
+      <div class="feat-cell">
+        <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M4 4v16h16" stroke="#C9A15C" stroke-width="1.3" stroke-linecap="round"/><path d="M8 15l3-4 3 3 4-6" stroke="#C9A15C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h4>過去データもすぐ確認</h4>
+        <p>普段の動作は軽いまま、何年前の伝票・売上も瞬時に呼び出せます。</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="band" id="benefits">
+<section class="band tight" id="flow" style="background: var(--bg-2);">
   <div class="wrap">
-    <div class="kicker">導入メリット</div>
-    <h2 class="sec-title">面倒な複雑を、<span class="thin">これ1本に。</span></h2>
-    <div class="benefit-grid">
-      <div class="benefit-card">
-        <h3>一元電子管理</h3>
-        <p>紙の伝票・電卓・エクセルで別々に管理していたものを、ひとつの画面にまとめます。</p>
+    <div class="kicker">導入までの流れ</div>
+    <h2 class="sec-title">今日から、<span class="thin">最短3日で。</span></h2>
+    <div class="promo-grid" style="grid-template-columns: repeat(3,1fr);">
+      <div class="promo-card" style="flex-direction:column; align-items:flex-start; text-align:left;">
+        <div class="promo-icon serif">1</div>
+        <h4 style="margin-top:6px;">資料提案</h4>
+        <p>お店の運営スタイルに合わせて、できることをご案内します。</p>
       </div>
-      <div class="benefit-card">
-        <h3>人手不足への予防策</h3>
-        <p>集計・給料計算をシステムが自動で行うため、少人数のスタッフでも運営が回ります。</p>
+      <div class="promo-card" style="flex-direction:column; align-items:flex-start; text-align:left;">
+        <div class="promo-icon serif">2</div>
+        <h4 style="margin-top:6px;">内容打ち合わせ</h4>
+        <p>メニュー・バック率など、お店に合わせて初期設定を行います。</p>
       </div>
-      <div class="benefit-card">
-        <h3>売上向上に集中できる</h3>
-        <p>雑務の工程そのものを減らすことで、接客・売上づくりに時間を使えるようになります。</p>
-      </div>
-      <div class="benefit-card">
-        <h3>ミスとムラをなくす</h3>
-        <p>手計算によるバック率の間違いや、集計の抜け漏れがなくなります。</p>
-      </div>
-      <div class="benefit-card">
-        <h3>データが増えても軽いまま</h3>
-        <p>普段の動作は直近のデータだけを見るので、何年分蓄積しても動作が重くなりません。</p>
-      </div>
-      <div class="benefit-card">
-        <h3>何年前のデータもすぐ確認</h3>
-        <p>過去の伝票・売上・給料も、日付や月を選ぶだけでいつでも正確に呼び出せます。</p>
+      <div class="promo-card" style="flex-direction:column; align-items:flex-start; text-align:left;">
+        <div class="promo-icon serif">3</div>
+        <h4 style="margin-top:6px;">実導入・試運転</h4>
+        <p>最短3日、基本1週間で稼働開始。導入後もサポートが続きます。</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="cta" id="cta">
+<section class="band" id="support">
   <div class="wrap">
-    <h2 class="serif">今日から、<br>もっとシンプルな店舗管理へ。</h2>
+    <div class="support-row">
+      <div>
+        <div class="kicker">導入後サポート</div>
+        <h3 class="serif" style="font-size:22px; margin:0 0 14px;">パソコンが苦手でも、<br>安心してお使いいただけます。</h3>
+        <p style="color:var(--muted); font-size:13.5px; line-height:1.8; margin:0 0 20px;">操作方法のご案内から、運用が始まってからのご相談まで。専任の担当が丁寧に対応します。</p>
+        <a class="btn btn-line" href="#contact">サポート内容を見る</a>
+      </div>
+      <div>
+        <div class="avatar-row">
+          <div class="avatar serif">U</div>
+          <div class="avatar serif">L</div>
+          <div class="avatar serif">T</div>
+        </div>
+        <p style="color:var(--muted-2); font-size:12.5px; margin-top:14px;">導入店舗様専任のサポート担当が、開店前・閉店後の忙しい時間帯にもご対応します。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="faq" style="background: var(--bg-2);">
+  <div class="wrap">
+    <div class="kicker">よくあるご質問</div>
+    <h2 class="sec-title">導入前に、<span class="thin">気になること。</span></h2>
+    <div class="faq">
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span class="qmark">Q</span><p>パソコンやレジの専門知識がなくても使えますか？</p><span class="plus">+</span>
+        </div>
+        <div class="faq-a"><p>はい。スマートフォンやタブレットの基本操作ができれば、特別な知識は不要です。導入時に操作方法もご案内します。</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span class="qmark">Q</span><p>複数のキャストが指名された場合、売上はどう計算されますか？</p><span class="plus">+</span>
+        </div>
+        <div class="faq-a"><p>選ばれた人数で自動的に均等分配されます。手作業で割り算する必要はありません。</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span class="qmark">Q</span><p>導入までどれくらいの期間がかかりますか？</p><span class="plus">+</span>
+        </div>
+        <div class="faq-a"><p>お打ち合わせの内容にもよりますが、最短3日、基本は1週間ほどで稼働を開始いただけます。</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span class="qmark">Q</span><p>キャストとスタッフで、料金や機能に違いはありますか？</p><span class="plus">+</span>
+        </div>
+        <div class="faq-a"><p>ご利用料金は人数にかかわらず定額です。給料計算の画面は、キャスト（歩合制）とスタッフ（時給制）で、それぞれの働き方に合わせて分かれています。</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+          <span class="qmark">Q</span><p>通信環境が悪い場合、使えなくなりますか？</p><span class="plus">+</span>
+        </div>
+        <div class="faq-a"><p>インターネット接続が必要なクラウド型のサービスです。安定したWi-Fi環境でのご利用をおすすめしています。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="contact">
+  <div class="wrap">
+    <div class="kicker">お問い合わせ</div>
+    <h2 class="sec-title">まずは、<span class="thin">お気軽にご相談ください。</span></h2>
+    <div class="contact-grid">
+      <div class="contact-card">
+        <span class="tagline">無料</span>
+        <h4>オンライン相談</h4>
+        <p>画面を見ながら、その場でご質問にお答えします。</p>
+        <a class="btn btn-line" href="#" style="width:100%;">オンライン相談</a>
+      </div>
+      <div class="contact-card">
+        <span class="tagline">お気軽に</span>
+        <h4>お問い合わせ</h4>
+        <p>導入のご相談・お見積もりのご依頼など。</p>
+        <a class="btn btn-line" href="#" style="width:100%;">お問い合わせ</a>
+      </div>
+      <div class="contact-card">
+        <span class="tagline">無料配布</span>
+        <h4>資料請求</h4>
+        <p>機能・料金プランをまとめた資料をお届けします。</p>
+        <a class="btn btn-gold" href="#" style="width:100%;">資料をもらう</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="closing">
+  <div class="wrap">
+    <h2>今日から、もっとシンプルな店舗管理へ。</h2>
     <p>難しい設定は必要ありません。パソコンが苦手なオーナー様でも、すぐにお使いいただけます。</p>
-    <a href="#" class="btn-primary">資料を請求する</a>
+    <a class="btn btn-gold" href="#contact">資料を請求する</a>
   </div>
 </section>
 
 <footer>
   <div class="wrap footer-row">
-    <div class="logo serif">ULTIMA</div>
-    <small>© ULTIMA — キャバクラ向け総合店舗管理サービス</small>
+    <a class="logo" href="#top" style="font-size:16px;"><span class="dot"></span>ULTIMA</a>
+    <div class="footer-links">
+      <a href="#features">機能</a>
+      <a href="#flow">導入について</a>
+      <a href="#faq">よくあるご質問</a>
+      <a href="#contact">お問い合わせ</a>
+    </div>
+    <span class="footer-links">© ULTIMA ― キャバクラ向け総合店舗管理サービス</span>
   </div>
 </footer>
+
+<div class="totop" id="totop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<script>
+  const totop = document.getElementById('totop');
+  window.addEventListener('scroll', () => {
+    totop.classList.toggle('show', window.scrollY > 600);
+  });
+</script>
 
 </body>
 </html>
