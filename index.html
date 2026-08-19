@@ -231,16 +231,25 @@
   @media (max-width: 860px){
     nav.primary, .nav-cta .link-small, .utility{ display:none; }
     .nav-cta .btn-gold{ padding: 9px 16px; font-size:12.5px; }
+    .hero{ padding: 56px 0 48px; }
     .hero-grid{ grid-template-columns:1fr; }
     .phone-stage{ order:-1; margin-bottom: 10px; }
-    .promo-grid, .venue-grid, .contact-grid{ grid-template-columns: 1fr 1fr; }
+    .promo-grid, .contact-grid{ grid-template-columns: 1fr 1fr; }
+    .venue-grid{ grid-template-columns: 1fr 1fr; gap:10px; }
+    .venue-card{ aspect-ratio: 3/3.4; }
+    .venue-card h4{ font-size:14px; }
+    .venue-card p.vdesc{ display:none; }
     .feat-grid{ grid-template-columns: repeat(2,1fr); }
-    .deep, .deep:nth-child(even){ grid-template-columns:1fr; }
+    .band{ padding: 52px 0; }
+    .band.tight{ padding: 40px 0; }
+    .deep, .deep:nth-child(even){ grid-template-columns:1fr; padding: 36px 0; }
     .deep:nth-child(even) .deep-visual{ order:0; }
     .support-row{ grid-template-columns:1fr; padding:28px; }
+    .closing{ padding: 64px 0; }
   }
   @media (max-width: 520px){
-    .promo-grid, .venue-grid, .contact-grid, .feat-grid{ grid-template-columns: 1fr; }
+    .promo-grid, .contact-grid, .feat-grid{ grid-template-columns: 1fr; }
+    .venue-grid{ grid-template-columns: 1fr 1fr; }
     .wrap{ padding:0 18px; }
   }
 </style>
