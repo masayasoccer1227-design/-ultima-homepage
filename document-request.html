@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>資料請求 | ULTIMA ― キャバクラ向け総合店舗管理サービス</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #050407;
+    --bg-2: #0c0a0f;
+    --panel: #16121a;
+    --hairline: rgba(201,161,92,0.16);
+    --gold: #C9A15C;
+    --gold-light: #E8CD94;
+    --gold-dim: rgba(201,161,92,0.55);
+    --text: #F5F0E8;
+    --muted: #9C93A0;
+    --muted-2: #6B6472;
+    --danger: #D85A30;
+    --serif: "Shippori Mincho", serif;
+    --sans: "Zen Kaku Gothic New", sans-serif;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0; background: var(--bg); color: var(--text);
+    font-family: var(--sans); -webkit-font-smoothing: antialiased;
+  }
+  a{ color: inherit; text-decoration: none; }
+  .serif{ font-family: var(--serif); }
+  .wrap{ max-width: 640px; margin: 0 auto; padding: 0 24px; }
+
+  header.nav{
+    border-bottom: 1px solid var(--hairline);
+  }
+  .nav-row{ display:flex; align-items:center; justify-content:space-between; height: 70px; max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+  .logo{ font-family: var(--serif); font-weight:800; font-size: 20px; letter-spacing: 0.16em; color: var(--text); display:flex; align-items:center; gap:8px; }
+  .logo .dot{ width:6px; height:6px; border-radius:50%; background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+  .back-link{ font-size: 13px; color: var(--muted); display:flex; align-items:center; gap:6px; }
+  .back-link:hover{ color: var(--gold-light); }
+
+  .hero{
+    padding: 64px 0 40px; text-align:center;
+    background: radial-gradient(ellipse 700px 400px at 50% -10%, rgba(201,161,92,0.14), transparent 60%);
+  }
+  .eyebrow{ font-size:12px; letter-spacing:.2em; color: var(--gold-light); margin-bottom:16px; }
+  .hero h1{ font-family: var(--serif); font-size: clamp(28px,4vw,38px); font-weight:700; margin:0 0 16px; }
+  .hero p{ color: var(--muted); font-size:14.5px; max-width:440px; margin: 0 auto; line-height:1.8; }
+
+  .form-panel{
+    background: var(--panel); border:1px solid var(--hairline); border-radius:6px;
+    padding: 36px 30px; margin: 20px 0 60px;
+  }
+  .field{ margin-bottom: 20px; }
+  .field label{ display:block; font-size: 13px; color: var(--gold-light); margin-bottom: 8px; }
+  .field label .req{ color: var(--danger); margin-left:4px; font-size:11px; }
+  .field input, .field select, .field textarea{
+    width:100%; background: var(--bg-2); border:1px solid var(--hairline); border-radius:4px;
+    padding: 12px 14px; font-size: 14.5px; color: var(--text); font-family: var(--sans);
+    transition: border-color .15s ease;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{ outline:none; border-color: var(--gold-dim); }
+  .field textarea{ resize: vertical; min-height: 90px; }
+  .field-row{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+
+  .submit-btn{
+    width:100%; padding: 15px; border-radius: 4px; border:none; cursor:pointer;
+    background: linear-gradient(180deg,var(--gold-light),var(--gold)); color:#1a1408;
+    font-size: 15px; font-weight:700; font-family: var(--sans); letter-spacing:.02em;
+    transition: filter .18s ease, transform .18s ease;
+  }
+  .submit-btn:hover{ filter: brightness(1.08); transform: translateY(-1px); }
+  .submit-btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+
+  .privacy-note{ font-size:11.5px; color: var(--muted-2); text-align:center; margin-top:16px; line-height:1.7; }
+
+  .success-panel{
+    display:none; text-align:center; padding: 60px 30px;
+    background: var(--panel); border:1px solid var(--hairline); border-radius:6px; margin: 20px 0 60px;
+  }
+  .success-panel .check{
+    width:56px; height:56px; border-radius:50%; border:1px solid var(--gold);
+    display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; color: var(--gold-light); font-size:24px;
+  }
+  .success-panel h3{ font-family: var(--serif); font-size:20px; margin: 0 0 12px; }
+  .success-panel p{ color: var(--muted); font-size:14px; line-height:1.8; }
+
+  .error-note{ display:none; color: var(--danger); font-size:13px; margin-top:14px; text-align:center; }
+
+  footer{ border-top:1px solid var(--hairline); padding: 28px 0; text-align:center; }
+  footer span{ font-size:11.5px; color: var(--muted-2); }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-row">
+    <a class="logo" href="index.html"><span class="dot"></span>ULTIMA</a>
+    <a class="back-link" href="index.html">← トップページに戻る</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">資料請求</div>
+    <h1>ULTIMAの資料をお届けします</h1>
+    <p>機能一覧・料金プランをまとめた資料を、無料でお送りします。下のフォームにご入力のうえ、送信してください。</p>
+  </div>
+</section>
+
+<div class="wrap">
+  <form id="request-form" class="form-panel" action="https://formspree.io/f/mbgrpeew" method="POST">
+    <div class="field-row">
+      <div class="field">
+        <label>店舗名<span class="req">必須</span></label>
+        <input type="text" name="店舗名" required placeholder="例）クラブ〇〇">
+      </div>
+      <div class="field">
+        <label>お名前<span class="req">必須</span></label>
+        <input type="text" name="お名前" required placeholder="例）山田 太郎">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>メールアドレス<span class="req">必須</span></label>
+        <input type="email" name="メールアドレス" required placeholder="example@mail.com">
+      </div>
+      <div class="field">
+        <label>電話番号</label>
+        <input type="tel" name="電話番号" placeholder="090-0000-0000">
+      </div>
+    </div>
+    <div class="field">
+      <label>業態</label>
+      <select name="業態">
+        <option value="キャバクラ">キャバクラ</option>
+        <option value="ラウンジ">ラウンジ</option>
+        <option value="クラブ">クラブ</option>
+        <option value="スナック">スナック</option>
+        <option value="その他">その他</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>ご質問・ご要望</label>
+      <textarea name="ご質問・ご要望" placeholder="運営中の店舗数や、気になる機能などあればご記入ください（任意）"></textarea>
+    </div>
+    <button type="submit" class="submit-btn">資料を請求する</button>
+    <p class="error-note" id="error-note">送信に失敗しました。時間をおいて再度お試しください。</p>
+    <p class="privacy-note">ご入力いただいた内容は、資料のご案内以外の目的には使用しません。</p>
+  </form>
+
+  <div class="success-panel" id="success-panel">
+    <div class="check">✓</div>
+    <h3>送信が完了しました</h3>
+    <p>お問い合わせありがとうございます。<br>担当より、資料とあわせてご連絡いたします。</p>
+  </div>
+</div>
+
+<footer>
+  <span>© ULTIMA ― キャバクラ向け総合店舗管理サービス</span>
+</footer>
+
+<script>
+  const form = document.getElementById('request-form');
+  const successPanel = document.getElementById('success-panel');
+  const errorNote = document.getElementById('error-note');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorNote.style.display = 'none';
+    const btn = form.querySelector('.submit-btn');
+    btn.disabled = true;
+    btn.textContent = '送信中…';
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' },
+      });
+      if (res.ok) {
+        form.style.display = 'none';
+        successPanel.style.display = 'block';
+      } else {
+        throw new Error('failed');
+      }
+    } catch (err) {
+      errorNote.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = '資料を請求する';
+    }
+  });
+</script>
+
+</body>
+</html>
