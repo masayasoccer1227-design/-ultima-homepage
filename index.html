@@ -205,10 +205,11 @@ html.loaded .hero h1 .ch{transform:none}
 @media (max-width:980px){.tgrid{grid-template-columns:1fr}.tcard{min-height:auto;padding:6vh 7vw}}
 
 /* ---------- profile ---------- */
-#support{position:relative;z-index:2;padding:14vh 6vw;border-top:1px solid var(--line);background:linear-gradient(180deg,rgba(7,6,10,.6),rgba(7,6,10,.35))}
+#support{position:relative;z-index:2;padding:14vh 6vw;border-top:1px solid var(--line);background:linear-gradient(180deg,rgba(7,6,10,.93),rgba(7,6,10,.97))}
 .pgrid{display:grid;grid-template-columns:1fr 1.2fr;gap:6vw;align-items:start}
 #support .en{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--mut);text-transform:uppercase}
-.pname{font-family:var(--serif);font-weight:900;font-size:clamp(44px,6.6vw,86px);margin-top:2.5vh;line-height:1.2}
+.pname{font-family:var(--serif);font-weight:900;font-size:clamp(30px,3.6vw,54px);margin-top:2.5vh;line-height:1.25;white-space:nowrap}
+@media (max-width:760px){.pname{white-space:normal;font-size:clamp(28px,7.6vw,40px)}}
 .prole{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--txt2);margin-top:1.6vh;text-transform:uppercase}
 .pbio{color:var(--txt2);line-height:2.3;font-size:clamp(13px,1.5vw,15px);border-left:1px solid var(--gold);padding-left:2.4vw}
 .pbio p+p{margin-top:2.2vh}
