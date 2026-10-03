@@ -144,6 +144,17 @@ main,footer,.hd{position:relative;z-index:1}
 @keyframes fall{to{top:100%}}
 
 /* the counter scene */
+/* particle field: scattered slips (chaos) gather into one sphere (structure) as you scroll */
+#field{position:absolute;inset:0;width:100%;height:100%;z-index:1;cursor:grab;touch-action:pan-y}
+#field:active{cursor:grabbing}
+.hero .grid{position:relative;z-index:2;pointer-events:none}
+.hero .grid a,.hero .grid button{pointer-events:auto}
+.hero .copy{grid-column:1/8}
+.hero .copy h1{text-shadow:0 4px 40px rgba(5,4,7,.85)}
+.sys{margin-top:28px;font-family:var(--f-num);font-size:11px;letter-spacing:.22em;color:var(--dim)}
+.sys b{color:var(--gold-hi);font-weight:500;margin-inline:6px}
+.sys .dot{display:inline-block;width:6px;height:6px;margin-right:10px;background:#7fc6b3;vertical-align:middle}
+.hero .scene{display:none}
 .scene{grid-column:6/13;position:relative;aspect-ratio:4/3.1;max-width:100%;perspective:1400px}
 .scene .tablet{position:absolute;inset:4% 4% 8% 4%;transform-style:preserve-3d;transform:rotateY(calc(-18deg + var(--p,0)*18deg)) rotateX(calc(10deg - var(--p,0)*10deg)) rotateZ(calc(2deg - var(--p,0)*2deg));transform-origin:60% 50%;z-index:2}
 .scene .tablet::after{content:"";position:absolute;inset:0;border-radius:22px;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.09) 0%,transparent 32%,transparent 70%,rgba(232,201,142,.06) 100%)}
@@ -438,6 +449,7 @@ footer small{display:block;margin-top:22px;font-size:var(--s-xs);color:var(--dim
   .hero-pin{height:auto}
   .hero{position:relative;height:auto;min-height:0;padding-block:110px 60px}
   .hero .copy,.scene{grid-column:1/-1}
+  .hero .copy{grid-column:1/-1}
   .scene{margin-top:48px;--t:1;--f:1}
   .glass{display:none}
   .hero .hint{display:none}
@@ -512,6 +524,7 @@ footer small{display:block;margin-top:22px;font-size:var(--s-xs);color:var(--dim
   <!-- HERO: the counter, cleared by scrolling -->
   <div class="hero-pin" id="hero-pin">
     <section class="hero wrap" aria-labelledby="h1">
+      <canvas id="field" aria-hidden="true"></canvas>
       <div class="grid">
         <div class="copy">
           <p class="kicker">キャバクラ向け総合店舗管理サービス</p>
@@ -525,6 +538,7 @@ footer small{display:block;margin-top:22px;font-size:var(--s-xs);color:var(--dim
             <a class="btn btn-gold mag" href="document-request.html">資料をもらう<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
             <a class="btn btn-line" href="#night">一夜の流れを見る</a>
           </div>
+          <p class="sys" aria-hidden="true"><span class="dot"></span>DRAG TO ROTATE — TAP TO RIPPLE<br><br>状態 —<b id="sys-l">散らかった伝票</b><span id="sys-n">000</span>%</p>
         </div>
 
         <div class="scene" id="scene" aria-label="ULTIMA の卓一覧画面とキャスト画面">
@@ -563,7 +577,7 @@ footer small{display:block;margin-top:22px;font-size:var(--s-xs);color:var(--dim
           <p class="cap">画面はイメージです。数字は例です。</p>
         </div>
       </div>
-      <p class="hint"><i></i>スクロール</p>
+      <p class="hint"><i></i>スクロールして、整理する</p>
     </section>
   </div>
 
@@ -983,6 +997,55 @@ const hero = () => {
 };
 addEventListener("scroll", hero, { passive: true }); addEventListener("resize", hero); hero();
 
+/* ── particle field ── */
+(() => {
+  const cv = document.getElementById("field"); if (!cv) return;
+  const cx = cv.getContext("2d"), sysN = document.getElementById("sys-n"), sysL = document.getElementById("sys-l");
+  const small = matchMedia("(max-width: 860px)").matches, N = small ? 1800 : 4200;
+  const COLS = ["#e8c98e","#e8c98e","#e8c98e","#c9a15c","#fff1d2","#7fc6b3","#9b8cc4"];
+  const P = [];
+  for (let i = 0; i < N; i++) {
+    const k = i + .5, phi = Math.acos(1 - 2 * k / N), th = Math.PI * (1 + Math.sqrt(5)) * k;
+    P.push({ sx: Math.cos(th) * Math.sin(phi), sy: Math.cos(phi), sz: Math.sin(th) * Math.sin(phi),
+      cx: (Math.random() * 2 - 1) * 2.2, cy: (Math.random() * 2 - 1) * 1.3, cz: (Math.random() * 2 - 1) * 1.2,
+      c: COLS[(Math.random() * COLS.length) | 0], s: Math.random() * 1.3 + .5, ph: Math.random() * 6.28 });
+  }
+  let W = 0, H = 0, dpr = 1, rotY = 0, rotX = -.25, vy = .0016, drag = null, ripples = [], m = 0, intro = 0;
+  const size = () => { dpr = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr; };
+  size(); addEventListener("resize", size);
+  cv.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, moved: 0 }; cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener("pointermove", e => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY; drag.moved += Math.abs(dx) + Math.abs(dy); rotY += dx * .005; rotX = clamp(rotX + dy * .004, -1.2, 1.2) ; vy = dx * .0008; });
+  cv.addEventListener("pointerup", e => { if (drag && drag.moved < 6) { const r = cv.getBoundingClientRect(); ripples.push({ x: e.clientX - r.left, y: e.clientY - r.top, t: performance.now() }); if (typeof chime === "function") chime(); } drag = null; });
+  const t0 = performance.now();
+  const frame = now => {
+    requestAnimationFrame(frame);
+    if (document.hidden) return;
+    const r = cv.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+    intro = Math.min(1, (now - t0) / 1800);
+    const target = (desktop() && !reduce) ? clamp(heroProgress() / .6) : clamp(-r.top / (H * .6));
+    m += (target - m) * .08; const e = ease(m);
+    if (!drag) { rotY += vy; vy += (.0016 - vy) * .02; }
+    const t = now / 1000, cyc = Math.cos(rotY), syc = Math.sin(rotY), cxr = Math.cos(rotX), sxr = Math.sin(rotX);
+    const R = Math.min(W, H) * (small ? .34 : .36), ox = W * (small ? .5 : .66 - e * .06), oy = H * (small ? .62 : .52), fov = 3.2;
+    cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, W, H);
+    ripples = ripples.filter(q => now - q.t < 1600);
+    for (const p of P) {
+      const n = (1 - e) * .08;
+      let x = p.cx + (p.sx - p.cx) * e + Math.sin(t * .6 + p.ph) * n, y = p.cy + (p.sy - p.cy) * e + Math.cos(t * .5 + p.ph) * n, z = p.cz + (p.sz - p.cz) * e;
+      let X = x * cyc - z * syc, Z = x * syc + z * cyc; let Y = y * cxr - Z * sxr; Z = y * sxr + Z * cxr;
+      const k = fov / (fov + Z), sxp = ox + X * R * k, syp = oy + Y * R * k;
+      let px = sxp, py = syp;
+      for (const q of ripples) { const age = (now - q.t) / 1000, d = Math.hypot(sxp - q.x, syp - q.y), w = age * 520 - d; if (w > 0 && w < 90) { const a = Math.sin(w / 90 * Math.PI) * 22 * (1 - age / 1.6); px += (sxp - q.x) / (d || 1) * a; py += (syp - q.y) / (d || 1) * a; } }
+      const al = (small ? .62 : 1) * intro * Math.max(.18, Math.min(1, (1.8 - Z) / 2)) * (.55 + .45 * Math.sin(t * 2 + p.ph * 3) ** 2);
+      cx.globalAlpha = al; cx.fillStyle = p.c; const sz = p.s * k * (small ? 1.05 : 1.9);
+      cx.fillRect(px, py, sz, sz);
+    }
+    cx.globalAlpha = 1;
+    const pct = Math.round(e * 100); sysN.textContent = String(pct).padStart(3, "0"); sysL.textContent = pct >= 98 ? "ULTIMA" : pct > 40 ? "整理中" : "散らかった伝票";
+  };
+  requestAnimationFrame(frame);
+})();
+
 /* hero tablet: a quiet live loop once it is on screen */
 const toast = document.getElementById("toast"), toastT = document.getElementById("toast-t"), t8 = document.getElementById("t8"), wait = document.getElementById("wait"), tbs = document.querySelectorAll(".tables .tb");
 const ping = el => { el.classList.remove("ping"); void el.offsetWidth; el.classList.add("ping"); };
@@ -1075,7 +1138,7 @@ gsap.ticker.lagSmoothing(0); // time-based: slow frames never leave the intro un
 /* intro */
 gsap.from(".hero h1 .ln>span", { yPercent: 105, duration: 1.3, ease: "expo.out", stagger: .1, delay: .1 });
 gsap.from(".hero .kicker, .hero .lead, .hero .acts", { y: 16, opacity: 0, duration: 1.1, ease: "expo.out", stagger: .08, delay: .45 });
-gsap.from(".scene .halo, .scene .tablet, .scene .float, .scene .glass", { y: 70, opacity: 0, duration: 1.6, ease: "expo.out", stagger: .12, delay: .3, clearProps: "opacity,transform" });
+gsap.from(".sys", { opacity: 0, duration: 1.2, delay: .9 });
 
 /* reveal the rest */
 gsap.utils.toArray(".night-intro > *, .venue, .feat, .ct, .flow li, .faq details, .sec-hd > *").forEach((el, i) => {
