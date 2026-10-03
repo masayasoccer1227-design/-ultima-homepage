@@ -40,7 +40,7 @@
 <body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Yomogi&family=Inter:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Yomogi&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500&display=swap">
 <style>
 /* Layout concept: "One night at the store".
    1) Hero is pinned: handwritten order slips and a calculator sit on the counter; scrolling clears them away
@@ -69,6 +69,8 @@
   --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
   --f-num:"Inter","Helvetica Neue",Arial,sans-serif;
   --f-hand:"Yomogi","Zen Kurenaido","Klee One",cursive;
+  --f-fig:"Bodoni Moda","Didot","Bodoni 72",Georgia,serif;  /* display figures */
+  --gold-grad:linear-gradient(176deg,#fff4dc 0%,#e8c98e 38%,#c9a15c 72%,#8f6b33 100%);
 
   --s-xs:11px;
   --s-sm:13px;
@@ -123,11 +125,6 @@ main,footer,.hd{position:relative;z-index:1}
 .snd[aria-pressed="true"] .bars i:nth-child(2){animation-delay:.15s}.snd[aria-pressed="true"] .bars i:nth-child(3){animation-delay:.3s}
 @keyframes eq{50%{height:10px}}
 
-/* night clock pill (mobile + outside the stage) */
-.clock{position:fixed;right:var(--gut);bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;align-items:center;gap:12px;padding:10px 16px;border:1px solid var(--line);border-radius:999px;background:rgba(5,4,7,.72);backdrop-filter:blur(8px);font-size:12px;color:var(--muted);transition:opacity .5s,transform .6s var(--ease)}
-.clock .t{font-family:var(--f-num);font-size:15px;color:var(--text);font-variant-numeric:tabular-nums;min-width:44px}
-.clock .ph{width:8px;height:8px;border-radius:50%;background:var(--gold)}
-.clock.hide{opacity:0;transform:translateY(12px);pointer-events:none}
 
 /* ── HERO (pinned) ── */
 .hero-pin{position:relative;height:240vh}
@@ -203,11 +200,15 @@ main,footer,.hd{position:relative;z-index:1}
 
 /* facts strip */
 .facts{border-block:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);position:relative;z-index:1;background:var(--night)}
-.fact{padding:26px var(--gut);border-right:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.fact{padding:clamp(28px,4vh,44px) var(--gut) clamp(26px,3.6vh,40px);border-right:1px solid var(--line);display:flex;flex-direction:column;gap:14px;position:relative}
 .fact:last-child{border-right:0}
-.fact b{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,2.6vw,38px);color:var(--gold-hi);line-height:1.1}
-.fact b small{font-size:.5em;margin-left:4px;color:var(--gold)}
-.fact span{font-size:var(--s-sm);color:var(--muted)}
+.fact::before{content:"";position:absolute;left:var(--gut);right:var(--gut);top:0;height:1px;background:linear-gradient(90deg,var(--gold),transparent);transform:scaleX(0);transform-origin:left;transition:transform 1.2s var(--ease)}
+.fact.in::before{transform:scaleX(1)}
+.fact b{display:flex;align-items:baseline;gap:8px;font-weight:400;line-height:1}
+.fact .fig{display:inline-block;line-height:1.08;padding-top:.04em;font-family:var(--f-fig);font-weight:400;font-size:clamp(64px,7.4vw,124px);letter-spacing:-.02em;font-variant-numeric:lining-nums tabular-nums;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 24px rgba(201,161,92,.18))}
+.fact b small{font-family:var(--f-display);font-weight:600;font-size:clamp(15px,1.3vw,19px);color:var(--gold-hi);letter-spacing:.06em}
+.fact b small.pre{align-self:center;writing-mode:vertical-rl;font-size:12px;letter-spacing:.2em;color:var(--gold)}
+.fact>span{font-size:var(--s-sm);color:var(--muted);line-height:1.7;max-width:19em;word-break:keep-all;overflow-wrap:anywhere}
 
 /* ── NIGHT ── */
 .night-intro{padding-block:clamp(90px,15vh,170px) clamp(20px,4vh,50px);display:grid;grid-template-columns:repeat(12,1fr);gap:0 24px}
@@ -218,7 +219,7 @@ main,footer,.hd{position:relative;z-index:1}
 /* mobile-first chapter: text then its visual */
 .ch{padding-block:clamp(60px,10vh,110px);border-top:1px solid var(--line-soft)}
 .ch .time{display:flex;align-items:baseline;gap:16px;margin-bottom:26px}
-.ch .time .t{font-family:var(--f-num);font-weight:300;font-size:clamp(44px,6vw,88px);line-height:1;color:var(--gold-hi);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.ch .time .t{font-family:var(--f-fig);font-weight:400;font-size:clamp(52px,7vw,96px);line-height:1;letter-spacing:-.02em;font-variant-numeric:lining-nums tabular-nums;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .ch .time span{font-size:var(--s-sm);color:var(--muted);letter-spacing:.1em}
 .ch h3{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,2.4vw,36px);line-height:1.45;margin-bottom:18px}
 .ch .txt>p{color:var(--muted);line-height:2;max-width:32em}
@@ -231,7 +232,8 @@ main,footer,.hd{position:relative;z-index:1}
 .stage-device{display:none}
 .dev{position:relative;height:100%;border-radius:24px;padding:16px;background:linear-gradient(160deg,#25202b,#0d0b10);border:1px solid rgba(241,236,228,.1);box-shadow:0 60px 140px rgba(0,0,0,.7);display:grid;grid-template-rows:auto 1fr}
 .dev-hd{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding:6px 8px 16px}
-.dev-time{font-family:var(--f-num);font-weight:300;font-size:clamp(54px,5.2vw,92px);line-height:.9;color:var(--gold-hi);letter-spacing:-.03em;font-variant-numeric:tabular-nums;display:flex;overflow:hidden}
+.dev-time{font-family:var(--f-fig);font-weight:400;font-size:clamp(60px,6vw,104px);line-height:.92;letter-spacing:-.02em;font-variant-numeric:lining-nums tabular-nums;display:flex;overflow:hidden;padding-bottom:.04em}
+.dev-time span{background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .dev-time span{display:inline-block}
 .dev-time.roll span{animation:roll .7s var(--ease)}
 @keyframes roll{from{transform:translateY(60%);opacity:0}}
@@ -349,9 +351,10 @@ main,footer,.hd{position:relative;z-index:1}
 .price .plan .nm h3{font-family:var(--f-display);font-weight:800;font-size:var(--s-lg)}
 .price .plan .nm span{font-size:var(--s-xs);color:var(--gold);border:1px solid rgba(201,161,92,.4);border-radius:999px;padding:4px 12px}
 .amt>span{display:block;font-size:var(--s-sm);color:var(--muted);margin-bottom:6px}
-.amt b{white-space:nowrap;font-family:var(--f-display);font-weight:800;font-size:clamp(40px,4.6vw,68px);line-height:1;color:var(--text)}
-.amt b small{font-family:var(--f-body);font-size:.28em;font-weight:500;color:var(--muted);margin-left:6px}
-.amt b .yen{font-size:.5em;margin-right:2px;color:var(--gold-hi)}
+.amt b{white-space:nowrap;display:flex;align-items:baseline;line-height:1}
+.amt .fig{display:inline-block;line-height:1.08;padding-top:.04em;font-family:var(--f-fig);font-weight:400;font-size:clamp(54px,6vw,96px);letter-spacing:-.02em;font-variant-numeric:lining-nums tabular-nums;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.amt b small{font-family:var(--f-body);font-size:13px;font-weight:500;color:var(--muted);margin-left:10px}
+.amt b .yen{font-family:var(--f-fig);font-style:italic;font-size:clamp(24px,2.4vw,36px);margin-right:4px;color:var(--gold)}
 .price .inc{grid-column:1/-1;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;border-top:1px solid var(--line);padding-top:24px;font-size:var(--s-sm)}
 .price .inc li{display:flex;gap:10px}
 .price .inc li::before{content:"✓";color:var(--gold)}
@@ -410,7 +413,7 @@ main,footer,.hd{position:relative;z-index:1}
 
 /* dawn */
 .dawn{padding-block:clamp(110px,18vh,210px) clamp(70px,10vh,120px);text-align:center;position:relative}
-.dawn .t{font-family:var(--f-num);font-size:12px;letter-spacing:.3em;color:var(--gold)}
+.dawn .t{font-family:var(--f-fig);font-style:italic;font-size:clamp(28px,2.6vw,40px);letter-spacing:.02em;color:var(--gold-hi)}
 .dawn h2{font-family:var(--f-display);font-weight:800;font-size:var(--s-xl);line-height:1.4;margin:22px auto 18px;max-width:18em}
 .dawn p{color:var(--muted);max-width:30em;margin-inline:auto}
 .dawn .acts{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-top:36px}
@@ -478,7 +481,6 @@ footer small{display:block;margin-top:22px;font-size:var(--s-xs);color:var(--dim
   .scene .float{display:none}
   .scene{aspect-ratio:4/3}
   .scene .tablet{inset:0}
-  .clock{right:16px;padding:8px 12px}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
@@ -509,7 +511,6 @@ footer small{display:block;margin-top:22px;font-size:var(--s-xs);color:var(--dim
   </div>
 </header>
 
-<div class="clock" id="clock" aria-hidden="true"><span class="ph"></span><span class="t num" id="clk">19:00</span><span id="clk-l">開店</span></div>
 
 <main id="top">
   <!-- HERO: the counter, cleared by scrolling -->
@@ -594,10 +595,10 @@ footer small{display:block;margin-top:22px;font-size:var(--s-xs);color:var(--dim
   </div>
 
   <div class="facts" aria-label="ULTIMA の特長">
-    <div class="fact"><b>1<small>画面</small></b><span>注文から給料まで完結</span></div>
-    <div class="fact"><b>0<small>円</small></b><span>紙の伝票代</span></div>
-    <div class="fact"><b>自動</b><span>日次・月次の締め</span></div>
-    <div class="fact"><b>最短3<small>日</small></b><span>で稼働開始</span></div>
+    <div class="fact"><b><span class="fig" data-to="1">1</span><small>画面</small></b><span>注文から給料まで、<wbr>ひとつの画面で完結</span></div>
+    <div class="fact"><b><span class="fig" data-from="99" data-to="0">0</span><small>円</small></b><span>紙の伝票代。<wbr>印刷も保管も<wbr>要りません</span></div>
+    <div class="fact"><b><span class="fig" data-to="4">4</span><small>業態</small></b><span>キャバクラ・<wbr>ラウンジ・<wbr>クラブ・<wbr>スナック</span></div>
+    <div class="fact"><b><small class="pre">最短</small><span class="fig" data-to="3">3</span><small>日</small></b><span>で稼働開始。<wbr>基本は1週間</span></div>
   </div>
 
   <!-- ONE NIGHT -->
@@ -837,8 +838,8 @@ footer small{display:block;margin-top:22px;font-size:var(--s-xs);color:var(--dim
     <div class="price">
       <div class="plan">
         <div class="nm"><h3>ULTIMA</h3><span>全機能込み</span></div>
-        <div class="amt"><span>導入費</span><b><span class="yen">¥</span>30,000<small>初回のみ</small></b></div>
-        <div class="amt"><span>月額</span><b><span class="yen">¥</span>40,000<small>/ 月</small></b></div>
+        <div class="amt"><span>導入費</span><b><span class="yen">¥</span><span class="fig" data-to="30000">30,000</span><small>初回のみ</small></b></div>
+        <div class="amt"><span>月額</span><b><span class="yen">¥</span><span class="fig" data-to="40000">40,000</span><small>/ 月</small></b></div>
         <ul class="inc">
           <li>注文・会計・卓管理</li>
           <li>給料計算・按分・バック率設定</li>
@@ -1059,8 +1060,8 @@ if (reduce) document.querySelectorAll(".split, .week").forEach(el => el.classLis
 const setHelp = on => document.querySelectorAll(".helpchip").forEach(c => { c.classList.toggle("on", on); const h = c.closest(".mi").querySelector(".helphint"); if (h) h.textContent = on ? "ヘルプ → ゆり（全額 ゆりの売上）" : "この1杯: 指名% → ゆり ／ フリー% → みすず"; });
 if (!reduce) { let on = false; setInterval(() => { on = !on; setHelp(on); }, 2600); }
 
-/* ── night clock pill + dawn ── */
-const clockEl = document.getElementById("clock"), clk = document.getElementById("clk"), clkL = document.getElementById("clk-l"), sky = document.querySelector(".sky"), stage = document.querySelector(".stage");
+/* ── dawn: the sky warms as the night ends ── */
+const sky = document.querySelector(".sky");
 const marks = [["19:00", "開店"], ...chs.map(c => [c.dataset.time, c.dataset.label]), ["05:00", "夜明け"]];
 const toMin = t => { let [h, m] = t.split(":").map(Number); if (h < 12) h += 24; return h * 60 + m; };
 const fmt = m => String(Math.floor(m / 60) % 24).padStart(2, "0") + ":" + String(Math.round(m % 60)).padStart(2, "0");
@@ -1071,14 +1072,24 @@ const clock = () => {
   const y = scrollY; let m = A[0].m, l = A[0].l;
   for (let i = 0; i < A.length - 1; i++) if (y >= A[i].y) { const p = clamp((y - A[i].y) / Math.max(1, A[i + 1].y - A[i].y)); m = A[i].m + (A[i + 1].m - A[i].m) * p; l = A[i].l; }
   if (y >= A[A.length - 1].y) { m = A[A.length - 1].m; l = A[A.length - 1].l; }
-  clk.textContent = fmt(m); clkL.textContent = l;
   sky.style.setProperty("--dawn", clamp((y - A[A.length - 2].y) / Math.max(1, A[A.length - 1].y - A[A.length - 2].y)).toFixed(3));
-  const sr = stage.getBoundingClientRect();
-  clockEl.classList.toggle("hide", desktop() && sr.top < innerHeight * .5 && sr.bottom > innerHeight * .5);
 };
 addEventListener("scroll", clock, { passive: true });
 addEventListener("resize", () => { anchors(); clock(); });
 clock();
+
+/* ── figures count up as they come into view ── */
+const fmtN = v => Math.round(v).toLocaleString("ja-JP");
+const countUp = el => {
+  const to = +el.dataset.to, from = el.dataset.from ? +el.dataset.from : 0, dur = to >= 1000 ? 1600 : 1100, t0 = performance.now();
+  const step = now => { const k = clamp((now - t0) / dur); el.textContent = fmtN(from + (to - from) * ease(k)); if (k < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+};
+const figs = document.querySelectorAll(".fig[data-to]");
+if (!reduce && "IntersectionObserver" in window) {
+  const io3 = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; countUp(e.target); const fc = e.target.closest(".fact"); if (fc) fc.classList.add("in"); io3.unobserve(e.target); }), { threshold: .6 });
+  figs.forEach(el => io3.observe(el));
+} else document.querySelectorAll(".fact").forEach(fc => fc.classList.add("in"));
 
 /* magnetic primary buttons */
 if (matchMedia("(hover: hover) and (pointer: fine)").matches && !reduce) document.querySelectorAll(".mag").forEach(b => {
