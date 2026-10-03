@@ -40,1116 +40,852 @@
 <body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Yomogi&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@700;900&display=swap">
 <style>
-/* Layout concept: "One night at the store".
-   1) Hero is pinned: handwritten order slips and a calculator sit on the counter; scrolling clears them away
-      and the ULTIMA tablet rises in their place — the tagline「伝票と電卓、卒業」as an experience.
-   2) The night is a sticky stage: one device on the right, chapters on the left. As you read, the device
-      screen and a large clock advance 19:00 → 01:10. Ends at dawn.
-   Brand system (black + gold, Shippori Mincho) is kept from the existing ULTIMA site. */
 :root{
-  color-scheme:dark;
-  --night:#050407;        /* page ground */
-  --panel:#0e0b12;        /* surfaces */
-  --panel-2:#16121b;
-  --gold:#c9a15c;         /* brand gold (existing site) */
-  --gold-hi:#e8c98e;
-  --text:#f1ece4;
-  --muted:#9b93a3;
-  --dim:#5f5867;
-  --paper:#f2ece0;        /* order slips */
-  --ink:#24202b;          /* handwriting */
-  --stamp:#b5432f;        /* paid stamp */
-  --line:rgba(201,161,92,.16);
-  --line-soft:rgba(241,236,228,.08);
-  --ok:#7fc8a0;
-
-  --f-display:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
-  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
-  --f-num:"Inter","Helvetica Neue",Arial,sans-serif;
-  --f-hand:"Yomogi","Zen Kurenaido","Klee One",cursive;
-  --f-fig:"Bodoni Moda","Didot","Bodoni 72",Georgia,serif;  /* display figures */
-  --gold-grad:linear-gradient(176deg,#fff4dc 0%,#e8c98e 38%,#c9a15c 72%,#8f6b33 100%);
-
-  --s-xs:11px;
-  --s-sm:13px;
-  --s-md:clamp(15px,1.05vw,16px);
-  --s-lg:clamp(20px,1.7vw,24px);
-  --s-xl:clamp(30px,3.8vw,56px);
-  --s-hero:clamp(36px,4.9vw,80px);
-  --gut:clamp(18px,4vw,60px);
-  --ease:cubic-bezier(.16,1,.3,1);
+  --bg:#07060a; --panel:rgba(18,14,22,.82);
+  --txt:#f1ece4; --txt2:#a69d93; --mut:#5d5663;
+  --gold:#e8c98e; --gold2:#c9a15c; --cool:#9b8cc4;
+  --line:rgba(241,236,228,.14);
+  --serif:'Noto Serif JP',serif;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Noto Sans JP',sans-serif;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html{background:var(--night)}
-body{background:var(--night);color:var(--text);font-family:var(--f-body);font-size:var(--s-md);line-height:1.9;-webkit-font-smoothing:antialiased;overflow-x:hidden;font-feature-settings:"palt"}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+html,body{overflow-x:clip}
+::selection{background:var(--gold);color:#07060a}
 a{color:inherit;text-decoration:none}
-button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-:focus-visible{outline:1px solid var(--gold);outline-offset:4px}
-::selection{background:var(--gold);color:var(--night)}
-h1,h2,h3,.lead{word-break:keep-all;overflow-wrap:anywhere;text-wrap:balance}
-.wrap{padding-inline:var(--gut);max-width:1440px;margin-inline:auto}
-.num{font-family:var(--f-num);font-variant-numeric:tabular-nums;letter-spacing:.02em}
-.kicker{display:inline-flex;align-items:center;gap:12px;font-size:var(--s-xs);letter-spacing:.24em;color:var(--gold)}
-.kicker::before{content:"";width:28px;height:1px;background:currentColor}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:52px;padding:0 28px;border-radius:2px;font-size:var(--s-sm);font-weight:700;letter-spacing:.08em;transition:background .4s,color .4s,border-color .4s;will-change:transform}
-.btn-gold{background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:#1a1408;box-shadow:0 10px 30px rgba(201,161,92,.18)}
-.btn-line{border:1px solid var(--line);color:var(--text)}
-.btn-line:hover{border-color:var(--gold);color:var(--gold-hi)}
-.btn svg{width:14px;height:14px}
+em{font-style:normal;color:var(--gold)}
 
-/* sky: dusk → midnight → dawn */
-.sky{position:fixed;inset:0;z-index:0;pointer-events:none;background:
-  radial-gradient(120% 70% at 50% 120%,rgba(201,161,92,calc(var(--dawn,0)*.55)),transparent 60%),
-  radial-gradient(90% 60% at 80% -10%,rgba(80,60,110,calc(.35 - var(--dawn,0)*.3)),transparent 60%)}
-main,footer,.hd{position:relative;z-index:1}
+/* ---------- loader ---------- */
+#ld{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;padding:6vh 6vw;transition:transform .95s cubic-bezier(.76,0,.24,1)}
+#ld .lrow{display:flex;align-items:flex-end;justify-content:space-between}
+#ld .lw{font-family:var(--serif);font-weight:900;font-style:italic;font-size:clamp(56px,10vw,140px);line-height:.9}
+#ld .ln{font-family:var(--mono);font-size:clamp(30px,6vw,76px);color:var(--gold)}
+#ld .lbar{height:1px;background:var(--line);margin-top:4vh;position:relative;overflow:hidden}
+#ld .lbar i{position:absolute;inset:0;background:var(--gold);transform:scaleX(0);transform-origin:left}
+html.loaded #ld{transform:translateY(-101%);pointer-events:none}
 
-/* header */
-.hd{position:fixed;inset:0 0 auto 0;z-index:50;padding-top:env(safe-area-inset-top,0px);transition:background .5s,border-color .5s;border-bottom:1px solid transparent}
-.hd.solid{background:rgba(5,4,7,.82);backdrop-filter:blur(10px);border-color:var(--line)}
-.hd .row{display:flex;align-items:center;justify-content:space-between;gap:20px;height:68px}
-.logo{display:flex;align-items:center;gap:10px;font-family:var(--f-num);font-weight:500;font-size:15px;letter-spacing:.34em}
-.logo .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold)}
-.hd nav{display:flex;gap:28px;font-size:var(--s-sm);color:var(--muted)}
-.hd nav a:hover{color:var(--text)}
-.hd .cta{display:flex;align-items:center;gap:10px}
-.hd .cta .btn{height:40px;padding:0 18px;font-size:12px}
-.snd{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--muted);transition:color .3s,border-color .3s}
-.snd:hover{color:var(--text);border-color:var(--gold)}
-.snd svg{width:14px;height:14px}
-.snd[aria-pressed="true"]{color:var(--gold-hi);border-color:var(--gold)}
-.snd .bars{display:inline-flex;gap:2px;align-items:center;height:10px}
-.snd .bars i{width:2px;height:4px;background:currentColor;border-radius:1px}
-.snd[aria-pressed="true"] .bars i{animation:eq 1s ease-in-out infinite}
-.snd[aria-pressed="true"] .bars i:nth-child(2){animation-delay:.15s}.snd[aria-pressed="true"] .bars i:nth-child(3){animation-delay:.3s}
-@keyframes eq{50%{height:10px}}
+/* ---------- hud / progress ---------- */
+#pbar{position:fixed;top:0;left:0;right:0;height:2px;z-index:150;background:transparent}
+#pbar i{display:block;height:100%;background:var(--gold);transform:scaleX(0);transform-origin:left}
+#hud{position:fixed;left:6vw;bottom:3.6vh;z-index:120;font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--mut);text-transform:uppercase;display:flex;gap:18px;mix-blend-mode:difference}
+#hud b{color:var(--gold);font-weight:400}
+@media (max-width:760px){#hud{left:5vw;bottom:2.4vh}}
 
+/* ---------- cursor ---------- */
+#cur{position:fixed;left:0;top:0;width:9px;height:9px;background:var(--gold);z-index:300;pointer-events:none;transform:translate(-50%,-50%);transition:width .25s,height .25s}
+#curR{position:fixed;left:0;top:0;width:38px;height:38px;border:1px solid rgba(232,201,142,.5);z-index:299;pointer-events:none;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s}
+html.curbig #cur{width:4px;height:4px}
+html.curbig #curR{width:70px;height:70px;border-color:var(--gold)}
+@media (pointer:coarse){#cur,#curR{display:none}}
 
-/* ── HERO (pinned) ── */
-.hero-pin{position:relative;height:240vh}
-.hero{position:sticky;top:0;height:100svh;min-height:640px;display:flex;align-items:center;overflow:hidden}
-.hero .grid{width:100%;display:grid;grid-template-columns:repeat(12,1fr);gap:0 24px;align-items:center;padding-top:40px}
-.hero .copy{grid-column:1/6;min-width:0;position:relative;z-index:3}
-.hero h1{font-family:var(--f-display);font-weight:800;font-size:var(--s-hero);line-height:1.18;letter-spacing:.01em;margin-block:22px 26px}
-.hero h1 .ln{display:block;overflow:hidden;padding-bottom:.04em;white-space:nowrap}
-.hero h1 .ln>span{display:inline-block}
-.hero h1 em{font-style:normal;color:var(--gold);position:relative;display:inline-block}
-.hero h1 em::after{content:"";position:absolute;left:-2%;right:-2%;top:54%;height:.075em;background:var(--gold-hi);transform:scaleX(var(--s,0));transform-origin:left;border-radius:1px;box-shadow:0 0 18px rgba(232,201,142,.5)}
-.hero .lead{font-size:var(--s-md);color:var(--muted);line-height:2;max-width:30em}
-.hero .acts{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
-.hero .hint{position:absolute;left:var(--gut);bottom:calc(26px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted);opacity:calc(1 - var(--p,0)*6)}
-.hero .hint i{width:1px;height:34px;background:var(--line);position:relative;overflow:hidden}
-.hero .hint i::after{content:"";position:absolute;left:0;top:-40%;width:1px;height:40%;background:var(--gold);animation:fall 2.2s var(--ease) infinite}
-@keyframes fall{to{top:100%}}
+/* ---------- header ---------- */
+header{position:fixed;inset:0 0 auto 0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 6vw;mix-blend-mode:difference}
+.brand{font-family:var(--serif);font-style:italic;font-weight:700;font-size:26px}
+nav{display:flex;align-items:center;gap:32px}
+nav .nl{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--txt2);position:relative;padding:4px 0}
+nav .nl::after{content:'';position:absolute;left:0;bottom:0;height:1px;width:100%;background:var(--gold);transform:scaleX(0);transform-origin:right;transition:transform .35s cubic-bezier(.76,0,.24,1)}
+nav .nl:hover::after{transform:scaleX(1);transform-origin:left}
+.hcta{font-family:var(--mono);font-size:12px;letter-spacing:.2em;border:1px solid var(--txt);color:var(--txt);padding:11px 22px;transition:background .3s,color .3s}
+.hcta:hover{background:var(--txt);color:#07060a}
+@media (max-width:760px){nav .nl{display:none}}
 
-/* the counter scene */
-/* particle field: scattered slips (chaos) gather into one sphere (structure) as you scroll */
-#field{position:absolute;inset:0;width:100%;height:100%;z-index:1;cursor:grab;touch-action:pan-y}
-#field:active{cursor:grabbing}
-.hero .grid{position:relative;z-index:2;pointer-events:none}
-.hero .grid a,.hero .grid button{pointer-events:auto}
-.hero .copy{grid-column:1/8}
-.hero .copy h1{text-shadow:0 4px 40px rgba(5,4,7,.85)}
-.sys{margin-top:28px;font-family:var(--f-num);font-size:11px;letter-spacing:.22em;color:var(--dim)}
-.sys b{color:var(--gold-hi);font-weight:500;margin-inline:6px}
-.sys .dot{display:inline-block;width:6px;height:6px;margin-right:10px;background:#7fc6b3;vertical-align:middle}
-.hero .scene{display:none}
-.scene{grid-column:6/13;position:relative;aspect-ratio:4/3.1;max-width:100%;perspective:1400px}
-.scene .tablet{position:absolute;inset:4% 4% 8% 4%;transform-style:preserve-3d;transform:rotateY(calc(-18deg + var(--p,0)*18deg)) rotateX(calc(10deg - var(--p,0)*10deg)) rotateZ(calc(2deg - var(--p,0)*2deg));transform-origin:60% 50%;z-index:2}
-.scene .tablet::after{content:"";position:absolute;inset:0;border-radius:22px;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.09) 0%,transparent 32%,transparent 70%,rgba(232,201,142,.06) 100%)}
-.halo{position:absolute;inset:-12% -10% -14% -6%;z-index:0;pointer-events:none;background:radial-gradient(46% 42% at 54% 52%,rgba(201,161,92,.28),transparent 70%),radial-gradient(30% 26% at 30% 80%,rgba(120,90,170,.22),transparent 70%);filter:blur(10px)}
-.halo::before{content:"";position:absolute;left:8%;right:4%;top:50%;height:1px;background:linear-gradient(90deg,transparent,rgba(232,201,142,.55),transparent);transform:rotate(-8deg)}
-.glass{position:absolute;z-index:4;display:flex;flex-direction:column;gap:4px;padding:14px 18px;border-radius:14px;border:1px solid rgba(232,201,142,.28);background:linear-gradient(160deg,rgba(40,33,46,.78),rgba(12,10,16,.7));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 24px 50px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08)}
-.glass .l{font-size:10px;letter-spacing:.18em;color:var(--muted)}
-.glass .v{font-family:var(--f-fig);font-size:clamp(26px,2.4vw,38px);line-height:1.1;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:lining-nums tabular-nums}
-.glass .d{font-size:10px;color:#9fd3a8}
-.glass.g1{left:-4%;top:-2%;transform:translateY(calc(var(--p,0)*-70px));animation:bob 6s ease-in-out infinite}
-.glass.g2{left:-8%;bottom:10%;flex-direction:row;align-items:center;gap:12px;transform:translateY(calc(var(--p,0)*-40px));animation:bob 7s ease-in-out -2s infinite}
-.glass.g2 .ic{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:#1a1408;font-size:13px;font-weight:700}
-.glass.g2 b{font-size:12px;font-weight:600;color:var(--text);display:block}
-.glass.g2 span{font-size:10px;color:var(--muted)}
-@keyframes bob{50%{translate:0 -8px}}
-.scene .float{position:absolute;right:-2%;bottom:-2%;width:28%;min-width:140px;aspect-ratio:9/19;border-radius:22px;padding:7px;background:linear-gradient(160deg,#25202b,#0d0b10);border:1px solid rgba(241,236,228,.1);box-shadow:0 40px 80px rgba(0,0,0,.6);z-index:3;
-  transform:translateY(calc(var(--p,0) * -110px)) rotate(calc(4deg - var(--p,0)*4deg))}
+/* ---------- canvas ---------- */
+#field{position:fixed;inset:0;z-index:0;display:block}
 
-/* tablet mock */
-.tablet{border-radius:22px;padding:14px;background:linear-gradient(160deg,#25202b,#0d0b10);border:1px solid rgba(241,236,228,.1);box-shadow:0 60px 120px rgba(0,0,0,.65),0 0 0 1px rgba(0,0,0,.6) inset}
-.screen{position:relative;width:100%;height:100%;border-radius:10px;overflow:hidden;background:#0b0910;display:grid;grid-template-rows:auto 1fr}
-.scr-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line-soft);font-size:10px;color:var(--muted)}
-.scr-hd b{color:var(--text);font-weight:500;letter-spacing:.2em;font-family:var(--f-num)}
-.scr-hd .wait{display:flex;gap:6px;align-items:center}
-.scr-hd .wait i{width:6px;height:6px;border-radius:50%;background:var(--ok)}
-.tables{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;gap:8px;padding:12px}
-.tb{border:1px solid var(--line-soft);border-radius:6px;padding:8px 9px;display:flex;flex-direction:column;gap:3px;font-size:9px;color:var(--dim);min-width:0;transition:border-color .5s,background .5s}
-.tb .n{font-family:var(--f-display);font-size:13px;color:var(--muted)}
-.tb .tm{font-family:var(--f-num);font-size:11px;color:var(--gold-hi);font-variant-numeric:tabular-nums}
-.tb .tm small{color:var(--muted);font-size:9px}
-.tb .who{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tb.on{border-color:rgba(201,161,92,.45);background:rgba(201,161,92,.06)}
-.tb.on .n{color:var(--text)}
-.tb.ping{animation:ping 1.6s var(--ease)}
-@keyframes ping{0%{box-shadow:0 0 0 0 rgba(232,201,142,.55)}100%{box-shadow:0 0 0 14px rgba(232,201,142,0)}}
-.toast{position:absolute;left:50%;top:50px;transform:translate(-50%,-14px);opacity:0;display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:999px;background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:#1a1408;font-size:11px;font-weight:700;white-space:nowrap;transition:opacity .4s,transform .6s var(--ease);box-shadow:0 14px 30px rgba(0,0,0,.4);z-index:2}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-.toast .wave{display:flex;gap:2px;align-items:center;height:12px}
-.toast .wave i{width:2px;background:#1a1408;border-radius:2px;animation:wv .8s ease-in-out infinite}
-.toast .wave i:nth-child(1){height:5px}.toast .wave i:nth-child(2){height:11px;animation-delay:.1s}.toast .wave i:nth-child(3){height:7px;animation-delay:.2s}
-@keyframes wv{50%{transform:scaleY(.4)}}
-.float .ph-scr{width:100%;height:100%;border-radius:16px;background:#0b0910;padding:14px 12px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
-.float .lbl{font-size:9px;color:var(--muted)}
-.float .big{font-family:var(--f-num);font-size:22px;color:var(--text);line-height:1}
-.float .row{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);border-bottom:1px solid var(--line-soft);padding-bottom:5px}
-.float .row b{font-family:var(--f-num);font-weight:500;color:var(--text)}
-.float .tot{display:flex;justify-content:space-between;font-size:10px;color:var(--gold-hi);margin-top:auto}
-.float .tot b{font-family:var(--f-num);font-weight:500}
-.scene .cap{position:absolute;left:6%;bottom:-6%;font-size:var(--s-xs);color:var(--dim)}
+/* ---------- hero ---------- */
+.hero{position:relative;z-index:2;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 6vw 9vh}
+.kick{font-family:var(--mono);font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--txt2);margin-bottom:3.5vh}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(64px,14.5vw,220px);line-height:1;letter-spacing:-.02em;mix-blend-mode:difference;will-change:transform}
+.hero h1 .row{display:block;overflow:hidden}
+.hero h1 .ch{display:inline-block;transform:translateY(118%) rotate(7deg);transition:transform 1s cubic-bezier(.76,0,.24,1);transition-delay:calc(var(--i)*70ms)}
+html.loaded .hero h1 .ch{transform:none}
+.hero h1 .ch:hover{transform:translateY(-4%)}
+.hsub{margin-top:4vh;color:var(--txt2);font-size:clamp(13px,1.5vw,16px);line-height:2;max-width:30em}
+.hint{margin-top:3vh;font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--mut);text-transform:uppercase;display:flex;align-items:center;gap:12px}
+.hint i{display:block;width:7px;height:7px;background:var(--cool);animation:bl 2.2s infinite}
+@keyframes bl{0%,100%{opacity:.25}50%{opacity:1}}
+.cue{position:absolute;right:6vw;bottom:8vh;font-family:var(--mono);font-size:10px;letter-spacing:.34em;color:var(--mut);writing-mode:vertical-rl;text-transform:uppercase}
 
-/* facts strip */
-.facts{border-block:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);position:relative;z-index:1;background:var(--night)}
-.fact{padding:clamp(28px,4vh,44px) var(--gut) clamp(26px,3.6vh,40px);border-right:1px solid var(--line);display:flex;flex-direction:column;gap:14px;position:relative}
-.fact:last-child{border-right:0}
-.fact::before{content:"";position:absolute;left:var(--gut);right:var(--gut);top:0;height:1px;background:linear-gradient(90deg,var(--gold),transparent);transform:scaleX(0);transform-origin:left;transition:transform 1.2s var(--ease)}
-.fact.in::before{transform:scaleX(1)}
-.fact b{display:flex;align-items:baseline;gap:8px;font-weight:400;line-height:1}
-.fact .fig{display:inline-block;line-height:1.08;padding-top:.04em;font-family:var(--f-fig);font-weight:400;font-size:clamp(64px,7.4vw,124px);letter-spacing:-.02em;font-variant-numeric:lining-nums tabular-nums;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 24px rgba(201,161,92,.18))}
-.fact b small{font-family:var(--f-display);font-weight:600;font-size:clamp(15px,1.3vw,19px);color:var(--gold-hi);letter-spacing:.06em}
-.fact b small.pre{align-self:center;writing-mode:vertical-rl;font-size:12px;letter-spacing:.2em;color:var(--gold)}
-.fact>span{font-size:var(--s-sm);color:var(--muted);line-height:1.7;max-width:19em;word-break:keep-all;overflow-wrap:anywhere}
+/* ---------- statement ---------- */
+.stmt{position:relative;z-index:2;padding:34vh 6vw;will-change:transform}
+.stmt .line{position:relative;display:block;font-family:var(--serif);font-weight:900;line-height:1.32;color:transparent;-webkit-text-stroke:1px rgba(241,236,228,.32);margin:3vh 0;white-space:nowrap;will-change:transform}
+.stmt .s1{font-size:clamp(26px,4.7vw,72px)}
+.stmt .s2{font-size:clamp(30px,6.8vw,102px)}
+.stmt .s3{font-size:clamp(34px,9.2vw,138px)}
+.stmt .line b{position:absolute;inset:0;color:var(--txt);-webkit-text-stroke:0;font-weight:inherit;clip-path:inset(0 100% 0 0)}
+@media (max-width:760px){.stmt .line{white-space:normal;word-break:keep-all;overflow-wrap:anywhere;font-size:clamp(24px,7.4vw,40px);line-height:1.4}
+  .hero h1{font-size:clamp(38px,10.4vw,64px);letter-spacing:-.03em;line-height:1.08}
+  .hhead,#features .wh,#pricing .th{flex-direction:column;align-items:flex-start;gap:1.2vh}}
 
-/* ── NIGHT ── */
-.night-intro{padding-block:clamp(90px,15vh,170px) clamp(20px,4vh,50px);display:grid;grid-template-columns:repeat(12,1fr);gap:0 24px}
-.night-intro .kicker{grid-column:1/-1;margin-bottom:22px}
-.night-intro h2{grid-column:1/9;font-family:var(--f-display);font-weight:800;font-size:var(--s-xl);line-height:1.35}
-.night-intro p{grid-column:1/7;margin-top:22px;color:var(--muted);max-width:32em}
+/* ---------- pinned horizontal ---------- */
+.hwrap{position:relative;z-index:2;height:380vh}
+.hstick{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+.hhead{padding:0 6vw 4vh;display:flex;align-items:baseline;justify-content:space-between}
+.hhead .en{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--mut);text-transform:uppercase}
+.hhead h2{font-family:var(--serif);font-weight:900;font-size:clamp(32px,5vw,64px)}
+.hbar{height:1px;background:var(--line);margin:0 6vw 5vh;position:relative}
+.hbar i{position:absolute;inset:0;background:var(--gold);transform:scaleX(0);transform-origin:left}
+.htrack{display:flex;gap:5vw;padding:0 6vw;will-change:transform}
+.panel{flex:0 0 66vw;max-width:720px;min-height:50vh;border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:6vh 3.4vw 5vh;position:relative;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+.pnum{font-family:var(--mono);font-size:clamp(80px,17vh,170px);line-height:.9;color:transparent;-webkit-text-stroke:1px var(--mut);will-change:transform}
+.ptt{font-family:var(--serif);font-weight:900;font-size:clamp(30px,4.2vw,52px);margin:3vh 0 1.6vh}
+.ptx{color:var(--txt2);line-height:2;font-size:clamp(13px,1.5vw,15px);max-width:30em}
+.ptag{position:absolute;top:5vh;right:2.6vw;writing-mode:vertical-rl;font-family:var(--mono);font-size:10px;letter-spacing:.34em;color:var(--mut);text-transform:uppercase}
+.plist{list-style:none;margin-top:3vh}
+.plist li{display:flex;gap:1.4em;align-items:baseline;padding:1.25vh 0;border-top:1px solid var(--line);font-size:clamp(12px,1.3vw,15px);color:var(--txt2);line-height:1.8}
+.plist li b{font-family:var(--mono);font-weight:400;font-size:10px;color:var(--gold);letter-spacing:.18em}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:2.6vh}
+.chips span{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--mut);border:1px solid var(--line);padding:5px 11px;text-transform:uppercase}
+.panel::after{content:'';position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform 1s cubic-bezier(.76,0,.24,1) .15s}
+.panel.on::after{transform:scaleX(1)}
+@media (max-width:760px){
+  .hwrap{height:auto}
+  .hstick{position:static;height:auto;overflow:visible;padding:16vh 0 4vh}
+  .htrack{flex-direction:column;gap:6vh;transform:none !important}
+  .panel{flex:auto;width:auto;min-height:auto;padding:5.5vh 7vw}
+}
 
-/* mobile-first chapter: text then its visual */
-.ch{padding-block:clamp(60px,10vh,110px);border-top:1px solid var(--line-soft)}
-.ch .time{display:flex;align-items:baseline;gap:16px;margin-bottom:26px}
-.ch .time .t{font-family:var(--f-fig);font-weight:400;font-size:clamp(52px,7vw,96px);line-height:1;letter-spacing:-.02em;font-variant-numeric:lining-nums tabular-nums;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.ch .time span{font-size:var(--s-sm);color:var(--muted);letter-spacing:.1em}
-.ch h3{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,2.4vw,36px);line-height:1.45;margin-bottom:18px}
-.ch .txt>p{color:var(--muted);line-height:2;max-width:32em}
-.ch ul{list-style:none;margin-top:24px;display:flex;flex-direction:column;border-top:1px solid var(--line-soft);max-width:34em}
-.ch li{display:flex;gap:14px;padding-block:12px;border-bottom:1px solid var(--line-soft);font-size:var(--s-sm)}
-.ch li::before{content:"";flex:none;width:6px;height:6px;margin-top:.7em;border-radius:50%;background:var(--gold)}
-.ch .vis{margin-top:36px}
+/* ---------- work rows ---------- */
+#features{position:relative;z-index:2;padding:18vh 0 12vh}
+#features .wh{padding:0 6vw 5vh;display:flex;align-items:baseline;justify-content:space-between}
+#features .wh .en{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--mut);text-transform:uppercase}
+#features .wh h2{font-family:var(--serif);font-weight:900;font-size:clamp(32px,5vw,64px)}
+.wlist{will-change:transform}
+.row2{position:relative;display:flex;align-items:baseline;gap:4vw;padding:6vh 6vw;border-top:1px solid var(--line);overflow:hidden}
+.row2:last-of-type{border-bottom:1px solid var(--line)}
+.row2::before{content:'';position:absolute;inset:0;background:var(--gold);transform:scaleY(0);transform-origin:bottom;transition:transform .5s cubic-bezier(.76,0,.24,1)}
+.row2:hover::before{transform:scaleY(1)}
+.row2 .rno{position:relative;font-family:var(--mono);font-size:12px;color:var(--mut);transition:color .3s}
+.row2 .rt{position:relative;font-family:var(--serif);font-weight:900;font-size:clamp(34px,7vw,92px);line-height:1.1;transition:color .3s,transform .5s cubic-bezier(.76,0,.24,1)}
+.row2 .ren{position:relative;margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--mut);text-transform:uppercase;transition:color .3s}
+.row2 .rar{position:relative;font-size:clamp(22px,3.4vw,40px);transform:translateX(-12px);opacity:0;transition:transform .5s,opacity .5s;color:#07060a}
+.row2:hover .rt{color:#07060a;transform:translateX(1.6vw)}
+.row2:hover .rno,.row2:hover .ren{color:rgba(7,6,10,.7)}
+.row2:hover .rar{transform:none;opacity:1}
 
-/* stage device (desktop) */
-.stage-device{display:none}
-.dev{position:relative;height:100%;border-radius:24px;padding:16px;background:linear-gradient(160deg,#25202b,#0d0b10);border:1px solid rgba(241,236,228,.1);box-shadow:0 60px 140px rgba(0,0,0,.7);display:grid;grid-template-rows:auto 1fr}
-.dev-hd{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding:6px 8px 16px}
-.dev-time{font-family:var(--f-fig);font-weight:400;font-size:clamp(60px,6vw,104px);line-height:.92;letter-spacing:-.02em;font-variant-numeric:lining-nums tabular-nums;display:flex;overflow:hidden;padding-bottom:.04em}
-.dev-time span{background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.dev-time span{display:inline-block}
-.dev-time.roll span{animation:roll .7s var(--ease)}
-@keyframes roll{from{transform:translateY(60%);opacity:0}}
-.dev-label{font-size:var(--s-sm);color:var(--muted);letter-spacing:.1em;margin-bottom:8px}
-.rail{display:flex;gap:6px;margin-bottom:12px}
-.rail i{width:28px;height:2px;border-radius:1px;background:var(--line-soft);transition:background .5s}
-.rail i.on{background:var(--gold)}
-.dev-screen{position:relative;border-radius:12px;background:#0b0910;overflow:hidden}
-.panel{position:absolute;inset:0;padding:clamp(18px,2vw,28px);display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateY(24px) scale(.985);transition:opacity .6s,transform .8s var(--ease);pointer-events:none}
-.panel.active{opacity:1;transform:none}
-.panel .card{background:transparent;border:0;padding:0}
+/* floating preview */
+#prev{position:fixed;left:0;top:0;width:230px;height:150px;z-index:90;pointer-events:none;overflow:hidden;opacity:0;transition:opacity .3s;border:1px solid var(--line)}
+#prev.show{opacity:1}
+#prev .pvs{height:500%;transition:transform .55s cubic-bezier(.76,0,.24,1)}
+#prev .pv{height:150px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:900;font-size:64px;color:rgba(7,6,10,.8)}
+#prev .pv:nth-child(1){background:repeating-radial-gradient(circle at 30% 40%,#e8c98e 0 2px,#1d1626 2px 16px)}
+#prev .pv:nth-child(2){background:conic-gradient(from .2turn,#e8c98e,#9b8cc4,#1d1626,#e8c98e)}
+#prev .pv:nth-child(3){background:repeating-linear-gradient(45deg,#e8c98e 0 10px,#07060a 10px 22px)}
+#prev .pv:nth-child(4){background:linear-gradient(#1d1626,#1d1626),repeating-linear-gradient(90deg,rgba(155,140,196,.6) 0 1px,transparent 1px 18px),repeating-linear-gradient(0deg,rgba(155,140,196,.6) 0 1px,transparent 1px 18px);background-blend-mode:screen;color:var(--gold)}
+#prev .pv:nth-child(5){background:repeating-linear-gradient(0deg,#c9a15c 0 3px,#07060a 3px 14px),linear-gradient(90deg,#9b8cc4,#07060a);background-blend-mode:multiply}
+@media (pointer:coarse){#prev{display:none}}
 
-.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:clamp(18px,2.4vw,30px);position:relative;overflow:hidden}
-.card .tag{display:block;font-size:10px;color:var(--dim);letter-spacing:.12em;margin-bottom:14px}
+/* ---------- tools ---------- */
+#pricing{position:relative;z-index:2;padding:14vh 6vw 16vh}
+#pricing .th{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6vh}
+#pricing .en{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--mut);text-transform:uppercase}
+#pricing h2{font-family:var(--serif);font-weight:900;font-size:clamp(32px,5vw,64px)}
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2.4vw}
+.tcard{position:relative;border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:6vh 2.2vw 5vh;min-height:44vh;overflow:hidden;transform-style:preserve-3d;will-change:transform;display:flex;flex-direction:column}
+.tcard .sheen{position:absolute;inset:0;background:radial-gradient(440px circle at var(--mx,50%) var(--my,50%),rgba(232,201,142,.16),transparent 62%);opacity:0;transition:opacity .35s;pointer-events:none}
+.tcard:hover .sheen{opacity:1}
+.tcard .ttag{font-family:var(--mono);font-size:10px;letter-spacing:.26em;color:var(--mut);text-transform:uppercase}
+.tcard .ttl{font-family:var(--serif);font-weight:900;font-size:clamp(26px,2.6vw,38px);margin:2.6vh 0 1.4vh}
+.tcard .td{color:var(--txt2);line-height:2;font-size:13px;max-width:26em}
+.tcard .gl{position:absolute;right:-2vw;bottom:-7vh;font-family:var(--serif);font-weight:900;font-size:clamp(150px,17vw,280px);line-height:1;color:transparent;-webkit-text-stroke:1px rgba(241,236,228,.1);pointer-events:none}
+@media (max-width:980px){.tgrid{grid-template-columns:1fr}.tcard{min-height:auto;padding:6vh 7vw}}
 
-/* 19:00 order */
-.order{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.order .tag{grid-column:1/-1;margin-bottom:0}
-.mi{border:1px solid var(--line-soft);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:8px;font-size:12px}
-.mi .nm{font-size:14px}
-.mi .pr{font-family:var(--f-num);color:var(--gold-hi);font-size:16px}
-.mi .fld{font-size:10px;color:var(--dim)}
-.mi .sel{border:1px solid var(--line);border-radius:4px;padding:7px 10px;display:flex;justify-content:space-between;color:var(--text)}
-.mi .chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:10px;color:var(--muted)}
-.chip{border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:10px;color:var(--muted);transition:all .4s}
-.chip.on{background:var(--gold);color:#1a1408;border-color:var(--gold)}
-.mi .hint{font-size:10px;color:var(--gold-hi);min-height:3.2em;line-height:1.6}
+/* ---------- profile ---------- */
+#support{position:relative;z-index:2;padding:14vh 6vw;border-top:1px solid var(--line);background:linear-gradient(180deg,rgba(7,6,10,.6),rgba(7,6,10,.35))}
+.pgrid{display:grid;grid-template-columns:1fr 1.2fr;gap:6vw;align-items:start}
+#support .en{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--mut);text-transform:uppercase}
+.pname{font-family:var(--serif);font-weight:900;font-size:clamp(44px,6.6vw,86px);margin-top:2.5vh;line-height:1.2}
+.prole{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--txt2);margin-top:1.6vh;text-transform:uppercase}
+.pbio{color:var(--txt2);line-height:2.3;font-size:clamp(13px,1.5vw,15px);border-left:1px solid var(--gold);padding-left:2.4vw}
+.pbio p+p{margin-top:2.2vh}
+.px{display:inline-block;margin-top:3.2vh;font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--cool);border-bottom:1px solid var(--cool);padding-bottom:4px}
+@media (max-width:760px){.pgrid{grid-template-columns:1fr;gap:5vh}.pbio{padding-left:6vw}}
 
-/* 21:30 split */
-.split svg{width:100%;height:auto;display:block;overflow:visible}
-.split .list{display:none;flex-direction:column;gap:12px;margin-top:4px}
-.split .list .src{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--line-soft);font-size:12px;color:var(--muted)}
-.split .list .src b{font-family:var(--f-num);font-size:20px;font-weight:400;color:var(--text)}
-.split .list .r{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:12px;color:var(--muted)}
-.split .list .r b{font-family:var(--f-num);font-weight:500;color:var(--gold-hi);font-size:14px}
-.split .list .r i{grid-column:1/-1;height:4px;border-radius:2px;background:var(--line-soft);position:relative;overflow:hidden}
-.split .list .r i::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--w);background:linear-gradient(90deg,var(--gold-hi),var(--gold))}
-.split .list .r.shop b{color:var(--muted)}
-.split .list .r.shop i::after{background:var(--dim)}
-.split .rules{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:6px;overflow:hidden;margin-top:18px}
-.split .rules div{background:var(--panel);padding:12px 14px;font-size:11px;color:var(--muted);line-height:1.7}
-.split .rules b{display:block;color:var(--text);font-weight:500;font-size:12px;margin-bottom:2px}
-.flowp{stroke-dasharray:var(--L,0);stroke-dashoffset:var(--L,0);transition:stroke-dashoffset 1.4s var(--ease)}
-.drawn .flowp{stroke-dashoffset:0}
+/* ---------- contact ---------- */
+#contact{position:relative;z-index:2;padding:30vh 6vw 26vh;text-align:center}
+#contact .en{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--mut);text-transform:uppercase}
+#contact h2{font-family:var(--serif);font-weight:900;font-size:clamp(40px,9vw,140px);line-height:1.25;margin-top:3vh;mix-blend-mode:difference}
+.mega{display:inline-block;margin-top:7vh;border:1px solid var(--gold);color:var(--gold);font-family:var(--mono);font-size:clamp(14px,2vw,21px);letter-spacing:.14em;padding:3.4vh 4.4vw;transition:background .3s,color .3s;will-change:transform;background:rgba(7,6,10,.5)}
+.mega:hover{background:var(--gold);color:#07060a}
+.xnote{display:block;margin-top:2.6vh;font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--mut)}
 
-/* 23:00 notifications */
-.notif{display:flex;flex-direction:column;gap:10px}
-.nt{display:flex;align-items:center;gap:14px;padding:12px 14px;border:1px solid var(--line-soft);border-radius:6px;background:var(--panel-2);font-size:12px}
-.nt .ic{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(201,161,92,.14);color:var(--gold-hi)}
-.nt .ic svg{width:14px;height:14px}
-.nt b{font-weight:500}
-.nt .when{margin-left:auto;font-family:var(--f-num);font-size:11px;color:var(--dim)}
-.nt.held{opacity:.55}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
-.stats div{border:1px solid var(--line-soft);border-radius:6px;padding:12px 14px}
-.stats span{display:block;font-size:10px;color:var(--dim)}
-.stats b{font-family:var(--f-num);font-size:24px;font-weight:400}
-.stats .neg{color:#e39a8a}
+/* ---------- footer ---------- */
+footer{position:relative;z-index:2;padding:8vh 6vw 5vh;overflow:hidden}
+.flogo{font-family:var(--serif);font-weight:900;font-style:italic;font-size:clamp(72px,17vw,290px);line-height:.85;color:transparent;-webkit-text-stroke:1.5px rgba(241,236,228,.22);transition:color .6s;cursor:default;text-align:center;will-change:transform}
+footer:hover .flogo{color:var(--txt)}
+.fmeta{display:flex;justify-content:space-between;gap:3vw;flex-wrap:wrap;margin-top:5vh;font-family:var(--mono);font-size:10px;letter-spacing:.22em;color:var(--mut);text-transform:uppercase}
+.fmeta .bn{text-transform:none}
+.fmeta a{color:var(--txt2)}
 
-/* 01:00 close */
-.close-v{display:grid;grid-template-columns:.9fr 1.1fr;gap:16px;align-items:stretch}
-.receipt{background:var(--paper);color:#1b1820;border-radius:4px;padding:18px 16px;font-size:11px;position:relative;clip-path:polygon(0 0,100% 0,100% 100%,94% 97%,88% 100%,82% 97%,76% 100%,70% 97%,64% 100%,58% 97%,52% 100%,46% 97%,40% 100%,34% 97%,28% 100%,22% 97%,16% 100%,10% 97%,4% 100%,0 97%)}
-.receipt h4{font-family:var(--f-display);font-size:14px;text-align:center;margin-bottom:10px;letter-spacing:.2em}
-.receipt .r{display:flex;justify-content:space-between;border-bottom:1px dashed rgba(27,24,32,.2);padding-block:5px}
-.receipt .r b{font-family:var(--f-num);font-weight:500}
-.receipt .r.t{border:0;margin-top:6px;font-size:13px;font-weight:700}
-.week{display:flex;flex-direction:column;gap:10px}
-.week .bars{flex:1;display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;min-height:150px;border-bottom:1px solid var(--line-soft);padding-bottom:6px}
-.week .bars i{display:block;background:linear-gradient(180deg,var(--gold-hi),rgba(201,161,92,.25));border-radius:2px 2px 0 0;height:var(--h);transform-origin:bottom;transform:scaleY(var(--grow,1));transition:transform 1s var(--ease)}
-.week .bars i:nth-child(2){transition-delay:.06s}.week .bars i:nth-child(3){transition-delay:.12s}.week .bars i:nth-child(4){transition-delay:.18s}.week .bars i:nth-child(5){transition-delay:.24s}.week .bars i:nth-child(6){transition-delay:.3s}.week .bars i:nth-child(7){transition-delay:.36s}
-.week .bars i.today{background:linear-gradient(180deg,#fff3dc,var(--gold))}
-.js .week:not(.drawn) .bars i{--grow:0}
-.week .days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;font-size:10px;color:var(--dim);text-align:center}
-.week .sum{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
-.week .sum b{font-family:var(--f-num);color:var(--text);font-weight:500}
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(30px);transition:opacity .9s,transform .9s cubic-bezier(.22,1,.36,1)}
+.rv.on{opacity:1;transform:none}
 
-/* 01:10 payroll */
-.pay table{width:100%;border-collapse:collapse;font-size:12px}
-.pay th{font-weight:400;color:var(--dim);font-size:10px;text-align:right;padding:0 0 10px;letter-spacing:.06em}
-.pay th:first-child{text-align:left}
-.pay td{padding:11px 0;border-top:1px solid var(--line-soft);text-align:right;font-family:var(--f-num);font-variant-numeric:tabular-nums}
-.pay td:first-child{text-align:left;font-family:var(--f-body)}
-.pay td.g{color:var(--gold-hi)}
-.pay .scroll{overflow-x:auto}
-.pay .done{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:12px;color:var(--ok)}
-.pay .done i{width:18px;height:18px;border-radius:50%;border:1px solid var(--ok);display:grid;place-items:center;font-style:normal;font-size:10px}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+  html{scroll-behavior:auto}
+  #ld,#prev{display:none}
+  .hero h1 .ch{transform:none}
+  .rv{opacity:1;transform:none}
+  .stmt .line b{clip-path:inset(0 0 0 0)}
+  .hwrap{height:auto}
+  .hstick{position:static;height:auto}
+  .htrack{flex-direction:column;transform:none !important}
+}
 
-/* sections */
-.sec{padding-block:clamp(90px,14vh,160px);border-top:1px solid var(--line)}
-.sec-hd{display:grid;grid-template-columns:repeat(12,1fr);gap:0 24px;align-items:end;margin-bottom:clamp(36px,6vh,60px)}
-.sec-hd .kicker{grid-column:1/-1;margin-bottom:18px}
-.sec-hd h2{grid-column:1/8;font-family:var(--f-display);font-weight:800;font-size:var(--s-xl);line-height:1.35}
-.sec-hd p{grid-column:8/13;color:var(--muted);font-size:var(--s-sm);line-height:2}
-.venues{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
-.venue{background:var(--night);padding:28px 24px 30px;display:flex;flex-direction:column;gap:12px;min-height:220px;transition:background .5s;position:relative;overflow:hidden}
-.venue::after{content:"";position:absolute;inset:auto 0 0 0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .7s var(--ease)}
-.venue:hover{background:var(--panel)}
-.venue:hover::after{transform:scaleX(1)}
-.venue .no{font-family:var(--f-num);font-size:11px;color:var(--gold)}
-.venue h3{font-family:var(--f-display);font-weight:800;font-size:clamp(22px,2vw,28px)}
-.venue p{font-size:var(--s-sm);color:var(--muted);line-height:1.9;margin-top:auto}
-.feats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft)}
-.feat{background:var(--night);padding:24px 22px 26px;display:flex;flex-direction:column;gap:10px;transition:background .5s}
-.feat:hover{background:var(--panel)}
-.feat svg{width:22px;height:22px;stroke:var(--gold);fill:none;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
-.feat h3{font-size:15px;font-weight:700}
-.feat p{font-size:var(--s-sm);color:var(--muted);line-height:1.85}
-
-/* pricing */
-.price{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:stretch}
-.price .plan{grid-column:1/8;border:1px solid var(--gold);border-radius:8px;padding:clamp(26px,3.4vw,46px);background:linear-gradient(180deg,rgba(201,161,92,.07),transparent 60%);display:grid;grid-template-columns:1fr 1fr;gap:28px 24px;position:relative;overflow:hidden}
-.price .plan::before{content:"";position:absolute;inset:-1px;background:linear-gradient(115deg,transparent 30%,rgba(232,201,142,.12) 50%,transparent 70%);transform:translateX(-100%);animation:sheen 6s ease-in-out infinite;pointer-events:none}
-@keyframes sheen{40%,100%{transform:translateX(100%)}}
-.price .plan .nm{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-.price .plan .nm h3{font-family:var(--f-display);font-weight:800;font-size:var(--s-lg)}
-.price .plan .nm span{font-size:var(--s-xs);color:var(--gold);border:1px solid rgba(201,161,92,.4);border-radius:999px;padding:4px 12px}
-.amt>span{display:block;font-size:var(--s-sm);color:var(--muted);margin-bottom:6px}
-.amt b{white-space:nowrap;display:flex;align-items:baseline;line-height:1}
-.amt .fig{display:inline-block;line-height:1.08;padding-top:.04em;font-family:var(--f-fig);font-weight:400;font-size:clamp(54px,6vw,96px);letter-spacing:-.02em;font-variant-numeric:lining-nums tabular-nums;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-.amt b small{font-family:var(--f-body);font-size:13px;font-weight:500;color:var(--muted);margin-left:10px}
-.amt b .yen{font-family:var(--f-fig);font-style:italic;font-size:clamp(24px,2.4vw,36px);margin-right:4px;color:var(--gold)}
-.price .inc{grid-column:1/-1;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;border-top:1px solid var(--line);padding-top:24px;font-size:var(--s-sm)}
-.price .inc li{display:flex;gap:10px}
-.price .inc li::before{content:"✓";color:var(--gold)}
-.price .side{grid-column:8/13;display:flex;flex-direction:column;justify-content:space-between;gap:22px;padding:6px 0}
-.price .side p{color:var(--muted);font-size:var(--s-sm);line-height:2}
-.price .side .note{font-size:var(--s-xs);color:var(--dim)}
-.price .cmp{border:1px solid var(--line-soft);border-radius:6px;padding:16px 18px;font-size:12px;color:var(--muted);display:grid;grid-template-columns:1fr auto;gap:6px 14px}
-.price .cmp b{font-family:var(--f-num);font-weight:500;color:var(--text)}
-.price .cmp .hd2{grid-column:1/-1;font-size:10px;color:var(--dim);letter-spacing:.1em}
-
-/* flow */
-.flow{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;position:relative}
-.flow::before{content:"";position:absolute;left:0;right:0;top:27px;height:1px;background:var(--line)}
-.flow li{position:relative;display:flex;flex-direction:column;gap:12px;padding-right:20px}
-.flow .st{width:54px;height:54px;border-radius:50%;border:1px solid var(--gold);background:var(--night);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:18px;color:var(--gold-hi)}
-.flow h3{font-family:var(--f-display);font-weight:800;font-size:var(--s-lg);margin-top:8px}
-.flow p{color:var(--muted);font-size:var(--s-sm);line-height:1.9}
-.flow .d{font-family:var(--f-num);font-size:var(--s-xs);color:var(--gold)}
-
-/* support */
-.support{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center}
-.support .txt{grid-column:1/7}
-.support .txt ul{list-style:none;margin-top:22px;border-top:1px solid var(--line-soft)}
-.support .txt li{padding-block:12px;border-bottom:1px solid var(--line-soft);font-size:var(--s-sm);display:flex;gap:12px}
-.support .txt li::before{content:"";width:6px;height:6px;margin-top:.7em;border-radius:50%;background:var(--gold);flex:none}
-.support .hours{grid-column:8/13;border:1px solid var(--line);border-radius:8px;padding:26px;background:var(--panel)}
-.hours .bar{position:relative;height:42px;margin-block:26px 10px;border-radius:4px;background:repeating-linear-gradient(90deg,var(--line-soft) 0 1px,transparent 1px calc(100%/12))}
-.hours .bar i{position:absolute;top:8px;bottom:8px;left:calc(100%/12*1);right:calc(100%/12*1);border-radius:3px;background:linear-gradient(90deg,rgba(201,161,92,.35),var(--gold),rgba(201,161,92,.35))}
-.hours .ax{display:flex;justify-content:space-between;font-size:10px;color:var(--dim)}
-.hours h3{font-family:var(--f-display);font-weight:800;font-size:var(--s-lg)}
-.hours p{font-size:var(--s-sm);color:var(--muted);margin-top:6px}
-.hours .ch3{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
-
-/* faq */
-.faq{border-top:1px solid var(--line)}
-.faq details{border-bottom:1px solid var(--line)}
-.faq summary{list-style:none;display:grid;grid-template-columns:40px 1fr 24px;gap:10px;align-items:center;padding-block:22px;cursor:pointer;font-size:var(--s-md);font-weight:500;transition:color .3s}
-.faq summary:hover{color:var(--gold-hi)}
+.biz{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;margin-top:5vh}
+.biz .en{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--mut);text-transform:uppercase}
+.biz .chips{margin-top:0}
+.pbio ul{list-style:none;margin-top:2.2vh}
+.pbio li{padding:1vh 0;border-top:1px solid var(--line)}
+.pbio li::before{content:'— ';color:var(--gold)}
+.ssub{margin-top:2.2vh;font-family:var(--serif);font-weight:700;font-size:clamp(18px,2vw,24px);color:var(--txt)}
+.faq{margin-top:4vh}
+.faq h3{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.3em;color:var(--mut);text-transform:uppercase;margin-bottom:1.6vh}
+.faq details{border-top:1px solid var(--line)}
+.faq details:last-child{border-bottom:1px solid var(--line)}
+.faq summary{cursor:pointer;list-style:none;padding:2vh 0;color:var(--txt);font-size:clamp(13px,1.5vw,15px);line-height:1.8;display:flex;gap:1em}
 .faq summary::-webkit-details-marker{display:none}
-.faq summary .q{font-family:var(--f-display);font-weight:800;color:var(--gold)}
-.faq summary .pm{width:14px;height:14px;position:relative;justify-self:end}
-.faq summary .pm::before,.faq summary .pm::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--gold);transition:transform .5s var(--ease)}
-.faq summary .pm::after{transform:rotate(90deg)}
-.faq details[open] .pm::after{transform:rotate(0)}
-.faq .a{padding:0 34px 24px 50px;color:var(--muted);font-size:var(--s-sm);line-height:2}
+.faq summary b{font-family:var(--mono);font-weight:400;color:var(--gold)}
+.faq details p{padding:0 0 2.2vh 2em;color:var(--txt2);line-height:2;font-size:13px}
 
-/* contact */
-.contact{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.ct{border:1px solid var(--line);border-radius:8px;padding:28px 26px;display:flex;flex-direction:column;gap:12px;background:var(--panel);transition:border-color .5s,transform .6s var(--ease)}
-.ct:hover{border-color:var(--gold);transform:translateY(-4px)}
-.ct .tg{align-self:flex-start;font-size:10px;color:var(--gold);border:1px solid rgba(201,161,92,.4);border-radius:999px;padding:3px 12px}
-.ct h3{font-family:var(--f-display);font-weight:800;font-size:var(--s-lg)}
-.ct p{font-size:var(--s-sm);color:var(--muted);line-height:1.9;flex:1}
-.ct .btn{margin-top:8px}
-.ct.main{border-color:rgba(201,161,92,.5);background:linear-gradient(180deg,rgba(201,161,92,.08),var(--panel))}
-
-/* dawn */
-.dawn{padding-block:clamp(110px,18vh,210px) clamp(70px,10vh,120px);text-align:center;position:relative}
-.dawn .t{font-family:var(--f-fig);font-style:italic;font-size:clamp(28px,2.6vw,40px);letter-spacing:.02em;color:var(--gold-hi)}
-.dawn h2{font-family:var(--f-display);font-weight:800;font-size:var(--s-xl);line-height:1.4;margin:22px auto 18px;max-width:18em}
-.dawn p{color:var(--muted);max-width:30em;margin-inline:auto}
-.dawn .acts{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin-top:36px}
-
-footer{border-top:1px solid var(--line);padding-top:36px;overflow:hidden}
-footer .row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
-footer nav{display:flex;flex-wrap:wrap;gap:22px;font-size:var(--s-sm);color:var(--muted)}
-footer nav a:hover{color:var(--text)}
-footer small{display:block;margin-top:22px;font-size:var(--s-xs);color:var(--dim)}
-.giant{font-family:var(--f-num);font-weight:300;font-size:clamp(70px,19vw,330px);line-height:.78;letter-spacing:.06em;white-space:nowrap;text-align:center;color:transparent;-webkit-text-stroke:1px rgba(201,161,92,.28);margin-top:40px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 1vw);user-select:none}
-
-/* ── desktop stage ── */
-@media (min-width:981px){
-  .stage{display:grid;grid-template-columns:5fr 7fr;gap:0 clamp(32px,4vw,72px);align-items:start}
-  .stage-texts .ch{min-height:86vh;display:flex;flex-direction:column;justify-content:center;border-top:0;padding-block:8vh}
-  .stage-texts .ch .vis{display:none}
-  .stage-texts .ch .time .t{font-size:clamp(28px,2.4vw,36px);opacity:.75}
-  .stage-texts .ch{opacity:.35;transition:opacity .6s}
-  .stage-texts .ch.active{opacity:1}
-  .stage-device{display:block;position:sticky;top:12vh;height:76vh;align-self:start;margin-block:8vh}
-}
-
-/* ── responsive ── */
-@media (max-width:980px){
-  .hd nav{display:none}
-  .hero-pin{height:auto}
-  .hero{position:relative;height:auto;min-height:0;padding-block:110px 60px}
-  .hero .copy,.scene{grid-column:1/-1}
-  .hero .copy{grid-column:1/-1}
-  .scene{margin-top:48px;--t:1;--f:1}
-  .glass{display:none}
-  .hero .hint{display:none}
-  .hero h1 em::after{transform:scaleX(1)}
-  .facts{grid-template-columns:1fr 1fr}
-  .fact:nth-child(2){border-right:0}
-  .fact:nth-child(-n+2){border-bottom:1px solid var(--line)}
-  .night-intro h2,.night-intro p{grid-column:1/-1}
-  .sec-hd h2,.sec-hd p{grid-column:1/-1}
-  .sec-hd p{margin-top:16px}
-  .venues,.feats{grid-template-columns:1fr 1fr}
-  .price .plan,.price .side{grid-column:1/-1}
-  .flow{grid-template-columns:1fr;gap:32px}
-  .flow::before{left:27px;right:auto;top:0;bottom:0;width:1px;height:auto}
-  .flow li{display:grid;grid-template-columns:54px 1fr;gap:4px 18px}
-  .flow li>*:not(.st){grid-column:2}
-  .flow .st{grid-row:1/5}
-  .support .txt,.support .hours{grid-column:1/-1}
-  .contact{grid-template-columns:1fr}
-}
-@media (max-width:560px){
-  .hd .cta .btn-line,.snd .lbl{display:none}
-  .order{grid-template-columns:1fr}
-  .order .mi:nth-child(3){display:none}
-  .close-v{grid-template-columns:1fr}
-  .venues,.feats{grid-template-columns:1fr}
-  .venue{min-height:0}
-  .price .plan{grid-template-columns:1fr}
-  .price .inc{grid-template-columns:1fr}
-  .split .rules{grid-template-columns:1fr}
-  .split svg{display:none}
-  .split .list{display:flex}
-  .stats b{font-size:20px}
-  .tables{gap:5px;padding:8px}
-  .tb{padding:6px;font-size:8px}
-  .tb .who{display:none}
-  .scene .float{display:none}
-  .scene{aspect-ratio:4/3}
-  .scene .tablet{inset:0}
-}
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation:none!important;transition:none!important}
-  .hero-pin{height:auto}
-  .hero{position:relative;height:auto;padding-block:120px 70px}
-  .scene{--t:1;--f:1}
-  .glass,.hero .hint{display:none}
-  .hero h1 em::after{transform:scaleX(1)}
-}
 </style>
 
-<div class="sky" aria-hidden="true"></div>
+<div id="ld" aria-hidden="true">
+  <div class="lrow"><div class="lw">ULTIMA</div><div class="ln"><span id="ldn">0</span></div></div>
+  <div class="lbar"><i id="ldb"></i></div>
+</div>
+<div id="pbar"><i id="pbi"></i></div>
+<div id="hud"><span>sys — <b id="hudn">chaos</b></span><span><b id="hudp">000</b>%</span></div>
+<div id="cur" aria-hidden="true"></div><div id="curR" aria-hidden="true"></div>
+<div id="prev" aria-hidden="true"><div class="pvs" id="pvs">
+  <div class="pv">注</div><div class="pv">会</div><div class="pv">給</div><div class="pv">勤</div><div class="pv">売</div>
+</div></div>
 
-<header class="hd" id="hd">
-  <div class="wrap row">
-    <a class="logo" href="#top" aria-label="ULTIMA トップへ"><span class="dot"></span>ULTIMA</a>
-    <nav aria-label="メイン">
-      <a href="#night">一夜の流れ</a><a href="#features">機能</a><a href="#pricing">料金</a><a href="#flow">導入の流れ</a><a href="#faq">よくあるご質問</a>
-    </nav>
-    <div class="cta">
-      <button class="snd" id="snd" type="button" aria-pressed="false" title="デモの注文音を鳴らす">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11.5 5.5a3.5 3.5 0 0 1 0 5"/></svg>
-        <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span class="lbl">注文音</span>
-      </button>
-      <a class="btn btn-line" href="contact.html">無料相談</a>
-      <a class="btn btn-gold mag" href="document-request.html">資料請求</a>
-    </div>
-  </div>
+<header>
+  <a class="brand" href="#top">ULTIMA</a>
+  <nav>
+    <a class="nl" href="#night">One night</a>
+    <a class="nl" href="#features">Features</a>
+    <a class="nl" href="#pricing">Pricing</a>
+    <a class="nl" href="#support">Support</a>
+    <a class="hcta" href="document-request.html">資料請求</a>
+  </nav>
 </header>
 
+<canvas id="field" aria-hidden="true"></canvas>
 
-<main id="top">
-  <!-- HERO: the counter, cleared by scrolling -->
-  <div class="hero-pin" id="hero-pin">
-    <section class="hero wrap" aria-labelledby="h1">
-      <canvas id="field" aria-hidden="true"></canvas>
-      <div class="grid">
-        <div class="copy">
-          <p class="kicker">キャバクラ向け総合店舗管理サービス</p>
-          <h1 id="h1">
-            <span class="ln"><span><em>伝票と電卓</em>、</span></span>
-            <span class="ln"><span>そろそろ</span></span>
-            <span class="ln"><span>卒業しませんか。</span></span>
-          </h1>
-          <p class="lead">注文・売上・給料計算・出勤管理。<wbr>バラバラだった夜の業務を、<wbr>ひとつの画面に。<wbr>スマホが使えれば、<wbr>今日から始められます。</p>
-          <div class="acts">
-            <a class="btn btn-gold mag" href="document-request.html">資料をもらう<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
-            <a class="btn btn-line" href="#night">一夜の流れを見る</a>
-          </div>
-          <p class="sys" aria-hidden="true"><span class="dot"></span>DRAG TO ROTATE — TAP TO RIPPLE<br><br>状態 —<b id="sys-l">散らかった伝票</b><span id="sys-n">000</span>%</p>
+<section class="hero" id="top" data-hud="chaos">
+  <p class="kick">ULTIMA — キャバクラ向け総合店舗管理サービス</p>
+  <h1 id="h1">
+    <span class="row"><span class="ch" style="--i:0">伝</span><span class="ch" style="--i:1">票</span><span class="ch" style="--i:2">と</span><span class="ch" style="--i:3">電</span><span class="ch" style="--i:4">卓</span><span class="ch" style="--i:5">、</span></span>
+    <span class="row"><span class="ch" style="--i:6"><em>卒</em></span><span class="ch" style="--i:7"><em>業</em></span><span class="ch" style="--i:8">し</span><span class="ch" style="--i:9">ま</span><span class="ch" style="--i:10">せ</span><span class="ch" style="--i:11">ん</span><span class="ch" style="--i:12">か</span><span class="ch" style="--i:13">。</span></span>
+  </h1>
+  <p class="hsub">注文・売上・給料計算・出勤管理。バラバラだった夜の業務を、ひとつの画面に。スマホが使えれば、今日から始められます。</p>
+  <p class="hint"><i></i>drag to rotate — tap to ripple</p>
+  <p class="cue">scroll</p>
+</section>
+
+<section class="stmt" id="stmt" data-hud="statement">
+  <span class="line s1" data-dx="1">紙の伝票は、<wbr>もう要りません。<b>紙の伝票は、<wbr>もう<em>要りません</em>。</b></span>
+  <span class="line s2" data-dx="-1">電卓の打ち直しより、<b>電卓の打ち直しより、</b></span>
+  <span class="line s3" data-dx="1">一夜を、<wbr>ひとつの画面に。<b>一夜を、<wbr><em>ひとつの画面</em>に。</b></span>
+</section>
+
+<div class="hwrap" id="night" data-hud="one night">
+  <div class="hstick">
+    <div class="hhead"><h2>一夜の流れ</h2><span class="en">one night — 19:00 → 01:10</span></div>
+    <div class="hbar"><i id="hbi"></i></div>
+    <div class="htrack" id="htrack">
+      <article class="panel">
+        <span class="ptag">open</span>
+        <div class="pnum">01</div>
+        <div>
+          <h3 class="ptt">19:00 開店</h3>
+          <p class="ptx">新しい注文はスタッフ画面に音と表示でお知らせ。待機中のキャストの人数や、卓ごとの経過時間もひと目でわかります。</p>
+          <ul class="plist">
+            <li><b>a</b>待機中の人数を、出勤数と客数から自動で表示</li>
+            <li><b>b</b>注文の通知音。鳴らなかったときは理由まで記録</li>
+            <li><b>c</b>延長・人数追加・場内指名も、卓一覧から数タップ</li>
+          </ul>
+          <div class="chips"><span>出勤</span><span>待機中</span><span>QR</span></div>
         </div>
-
-        <div class="scene" id="scene" aria-label="ULTIMA の卓一覧画面とキャスト画面">
-          <div class="halo" aria-hidden="true"></div>
-          <div class="tablet">
-            <div class="screen">
-              <div class="scr-hd"><b>ULTIMA</b><span>テーブル・QR</span><span class="wait"><i></i>待機中 <span class="num" id="wait">3</span>人</span></div>
-              <div class="tables">
-                <div class="tb on"><span class="n">1卓</span><span class="tm">19:12</span><span class="who">キャストA 指名・3名</span></div>
-                <div class="tb"><span class="n">2卓</span><span class="tm">—</span><span class="who">空席</span></div>
-                <div class="tb on"><span class="n">3卓</span><span class="tm">19:40</span><span class="who">フリー・2名</span></div>
-                <div class="tb"><span class="n">4卓</span><span class="tm">—</span><span class="who">空席</span></div>
-                <div class="tb on"><span class="n">5卓</span><span class="tm">20:05 <small>(20:40)</small></span><span class="who">キャストB 指名・4名</span></div>
-                <div class="tb"><span class="n">6卓</span><span class="tm">—</span><span class="who">空席</span></div>
-                <div class="tb on"><span class="n">7卓</span><span class="tm">20:31</span><span class="who">キャストC 指名・2名</span></div>
-                <div class="tb" id="t8"><span class="n">8卓</span><span class="tm">—</span><span class="who">空席</span></div>
-              </div>
-            </div>
-            <div class="toast" id="toast"><span class="wave" aria-hidden="true"><i></i><i></i><i></i></span><span id="toast-t">8卓・ご注文を送信しました</span></div>
-          </div>
-
-          <div class="glass g1" aria-hidden="true"><span class="l">本日の売上</span><span class="v">¥1,284,000</span><span class="d">▲ 自動で集計</span></div>
-          <div class="glass g2" aria-hidden="true"><i class="ic">♪</i><div><b>8卓から注文が届きました</b><span>ハイボール ×2 ・ キャストC</span></div></div>
-
-          <div class="float" aria-hidden="true">
-            <div class="ph-scr">
-              <span class="lbl">本日のバック合計</span>
-              <span class="big num">¥18,400</span>
-              <span class="row">ドリンク<b>¥4,200</b></span>
-              <span class="row">ボトル<b>¥6,000</b></span>
-              <span class="row">指名料<b>¥5,000</b></span>
-              <span class="row">按分（指名α）<b>¥3,200</b></span>
-              <span class="tot">キャスト画面<b>キャストA</b></span>
-            </div>
-          </div>
-          <p class="cap">画面はイメージです。数字は例です。</p>
+      </article>
+      <article class="panel">
+        <span class="ptag">order</span>
+        <div class="pnum">02</div>
+        <div>
+          <h3 class="ptt">20:30 注文</h3>
+          <p class="ptx">卓のQRから注文。キャストは飲んだ人を選ぶだけ。複数指名・場内・フリーの売上も、お店が決めた比率どおりに自動で振り分けます。</p>
+          <ul class="plist">
+            <li><b>a</b>指名者本人の1杯は、本人の売上に</li>
+            <li><b>b</b>ヘルプの1杯は「ヘルプ」を押すだけで、付き先の指名者へ</li>
+            <li><b>c</b>複数指名の売上は、人数で自動的に均等分配</li>
+          </ul>
+          <div class="chips"><span>QR注文</span><span>ヘルプ</span><span>按分</span></div>
         </div>
-      </div>
-      <p class="hint"><i></i>スクロールして、整理する</p>
-    </section>
+      </article>
+      <article class="panel">
+        <span class="ptag">checkout</span>
+        <div class="pnum">03</div>
+        <div>
+          <h3 class="ptt">23:40 会計</h3>
+          <p class="ptx">会計するたびに、日次・月次の売上が自動で積み上がります。現金とカードの内訳、税、カード手数料も会計時に計算済み。</p>
+          <ul class="plist">
+            <li><b>a</b>現金・カードの内訳と税を、会計と同時に計算</li>
+            <li><b>b</b>現金過不足をその場で確認</li>
+            <li><b>c</b>月次の収支・総利益まで自動で表示</li>
+          </ul>
+          <div class="chips"><span>現金</span><span>カード</span><span>日次・月次</span></div>
+        </div>
+      </article>
+      <article class="panel">
+        <span class="ptag">close</span>
+        <div class="pnum">04</div>
+        <div>
+          <h3 class="ptt">01:10 締め</h3>
+          <p class="ptx">項目ごとに売上とバックを自動で計算。打刻から労働時間も反映。キャストは自分のスマホから、いつでも実績を確認できます。</p>
+          <ul class="plist">
+            <li><b>a</b>キャストごとにバック率を個別設定</li>
+            <li><b>b</b>会計のたびに給料の明細を記録。あとから設定を変えても過去分は動かない</li>
+            <li><b>c</b>キャストとスタッフで給料計算の画面を分離</li>
+          </ul>
+          <div class="chips"><span>バック</span><span>打刻</span><span>明細</span></div>
+        </div>
+      </article>
+    </div>
   </div>
+</div>
 
-  <div class="facts" aria-label="ULTIMA の特長">
-    <div class="fact"><b><span class="fig" data-to="1">1</span><small>画面</small></b><span>注文から給料まで、<wbr>ひとつの画面で完結</span></div>
-    <div class="fact"><b><span class="fig" data-from="99" data-to="0">0</span><small>円</small></b><span>紙の伝票代。<wbr>印刷も保管も<wbr>要りません</span></div>
-    <div class="fact"><b><span class="fig" data-to="4">4</span><small>業態</small></b><span>キャバクラ・<wbr>ラウンジ・<wbr>クラブ・<wbr>スナック</span></div>
-    <div class="fact"><b><small class="pre">最短</small><span class="fig" data-to="3">3</span><small>日</small></b><span>で稼働開始。<wbr>基本は1週間</span></div>
+<section id="features" data-hud="features">
+  <div class="wh"><h2>機能</h2><span class="en">features — all in one</span></div>
+  <div class="wlist" id="wlist">
+    <a class="row2" href="#contact" data-pv="0"><span class="rno">01</span><span class="rt">注文・卓管理</span><span class="ren">order &amp; tables</span><span class="rar">→</span></a>
+    <a class="row2" href="#contact" data-pv="1"><span class="rno">02</span><span class="rt">会計</span><span class="ren">checkout</span><span class="rar">→</span></a>
+    <a class="row2" href="#contact" data-pv="2"><span class="rno">03</span><span class="rt">給料計算</span><span class="ren">payroll</span><span class="rar">→</span></a>
+    <a class="row2" href="#contact" data-pv="3"><span class="rno">04</span><span class="rt">出勤管理</span><span class="ren">shifts</span><span class="rar">→</span></a>
+    <a class="row2" href="#contact" data-pv="4"><span class="rno">05</span><span class="rt">売上集計</span><span class="ren">sales</span><span class="rar">→</span></a>
   </div>
+</section>
 
-  <!-- ONE NIGHT -->
-  <section class="wrap" id="night" aria-labelledby="night-t">
-    <div class="night-intro">
-      <p class="kicker">ULTIMA のある一夜</p>
-      <h2 id="night-t">開店から締めまで。<wbr>その時々に、<wbr>必要な画面だけを。</h2>
-      <p>夜のお店の仕事は、時間帯ごとに忙しさの中身が変わります。ULTIMA が営業のどの瞬間に何をしてくれるのか、一夜の流れで見てみましょう。</p>
-    </div>
-
-    <div class="stage">
-      <div class="stage-texts">
-        <article class="ch" id="ch1" data-time="19:00" data-label="来店・注文">
-          <div class="time"><span class="t">19:00</span><span>来店・注文</span></div>
-          <div class="txt">
-            <h3>注文は、<wbr>テーブルのQRから。<wbr>選ぶのは注文者だけ。</h3>
-            <p>卓のQRを読み込めば、その場で注文画面が開きます。キャストは飲んだ人を選ぶだけ。売上を誰に付けるかは、ULTIMA が自動で判断します。</p>
-            <ul>
-              <li>指名者本人の1杯は、本人の売上に</li>
-              <li>ヘルプの1杯は「ヘルプ」を押すだけで、付き先の指名者へ</li>
-              <li>注文が入ると、スタッフ画面に音と表示でお知らせ</li>
-            </ul>
-          </div>
-          <div class="vis">
-            <div class="card order" aria-label="注文画面のイメージ">
-              <span class="tag">注文画面</span>
-              <div class="mi">
-                <span class="nm">ウーロンハイ濃</span><span class="pr num">¥1,000</span>
-                <span class="fld">注文者</span><span class="sel">キャストD <span style="color:var(--dim)">▾</span></span>
-                <span class="chips">卓指名者: <b style="color:var(--gold-hi);font-weight:500">キャストA</b> <span class="chip helpchip">ヘルプ（指名者へ）</span></span>
-                <span class="hint helphint">この1杯: 指名% → キャストA ／ フリー% → キャストD</span>
-              </div>
-              <div class="mi">
-                <span class="nm">シャンパン</span><span class="pr num">¥30,000</span>
-                <span class="fld">注文者</span><span class="sel">キャストA <span style="color:var(--dim)">▾</span></span>
-                <span class="chips">卓指名者: <b style="color:var(--gold-hi);font-weight:500">キャストA</b></span>
-                <span class="hint">この1杯: 本人の1杯 → 全額 キャストA</span>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <article class="ch" id="ch2" data-time="21:30" data-label="指名・場内が重なる">
-          <div class="time"><span class="t">21:30</span><span>指名・場内が重なる</span></div>
-          <div class="txt">
-            <h3>誰の売上か、<wbr>もう揉めない。</h3>
-            <p>複数指名、場内指名、フリーで付いた子。夜のお店で一番もめやすい売上の分け方を、お店が決めた比率どおりに自動で振り分けます。比率もバック率も、お店ごとに自由に設定できます。</p>
-            <ul>
-              <li>複数指名の売上は、人数で自動的に均等分配</li>
-              <li>フリー・場内の子が飲んだ分は、設定した％で指名者にも還元</li>
-              <li>場内指名料は、受けた子にそのまま</li>
-            </ul>
-          </div>
-          <div class="vis">
-            <div class="card split" aria-label="ボトル1本の売上が按分される様子">
-              <span class="tag">按分の例（比率はお店ごとに設定）</span>
-              <svg viewBox="0 0 520 250" role="img" aria-label="フリーの子が飲んだボトル1万円が、指名者に40%、飲んだ子に30%、残りが店へ分かれる図">
-                
-                <rect x="8" y="95" width="140" height="62" rx="6" fill="#16121b" stroke="rgba(201,161,92,.5)"/>
-                <text x="22" y="120" fill="#9b93a3" font-size="11">ボトル 1本</text>
-                <text x="22" y="143" fill="#f1ece4" font-size="19" font-family="Inter,Arial">¥10,000</text>
-                <path class="flowp" d="M148 112 C 250 112, 250 45, 350 45" fill="none" stroke="#dcb978" stroke-width="2.4"/>
-                <path class="flowp" d="M148 126 C 250 126, 250 126, 350 126" fill="none" stroke="#dcb978" stroke-width="1.8"/>
-                <path d="M148 140 C 250 140, 250 207, 350 207" fill="none" stroke="rgba(241,236,228,.25)" stroke-width="1.4" stroke-dasharray="3 5"/>
-                <g font-size="11">
-                  <rect x="350" y="20" width="162" height="50" rx="6" fill="#0e0b12" stroke="rgba(201,161,92,.35)"/>
-                  <text x="364" y="40" fill="#9b93a3">指名者 A（指名 40%）</text>
-                  <text x="364" y="60" fill="#e8c98e" font-size="16" font-family="Inter,Arial">¥4,000</text>
-                  <rect x="350" y="101" width="162" height="50" rx="6" fill="#0e0b12" stroke="rgba(201,161,92,.35)"/>
-                  <text x="364" y="121" fill="#9b93a3">飲んだ子 D（30%）</text>
-                  <text x="364" y="141" fill="#e8c98e" font-size="16" font-family="Inter,Arial">¥3,000</text>
-                  <rect x="350" y="182" width="162" height="50" rx="6" fill="#0e0b12" stroke="rgba(241,236,228,.12)"/>
-                  <text x="364" y="202" fill="#5f5867">お店の取り分（残り）</text>
-                  <text x="364" y="222" fill="#9b93a3" font-size="16" font-family="Inter,Arial">¥3,000</text>
-                </g>
-              </svg>
-              <div class="list" aria-hidden="true">
-                <div class="src"><span>ボトル 1本（フリーの子が注文）</span><b>¥10,000</b></div>
-                <div class="r"><span>指名者 A（指名 40%）</span><b>¥4,000</b><i style="--w:40%"></i></div>
-                <div class="r"><span>飲んだ子 D（30%）</span><b>¥3,000</b><i style="--w:30%"></i></div>
-                <div class="r shop"><span>お店の取り分（残り）</span><b>¥3,000</b><i style="--w:30%"></i></div>
-              </div>
-              <div class="rules">
-                <div><b>本人の1杯</b>指名者本人に100%</div>
-                <div><b>ヘルプの1杯</b>付き先の指名者に100%</div>
-                <div><b>フリー・場内の子</b>設定した比率で按分</div>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <article class="ch" id="ch3" data-time="23:00" data-label="ピーク">
-          <div class="time"><span class="t">23:00</span><span>ピーク</span></div>
-          <div class="txt">
-            <h3>忙しい時間ほど、<wbr>注文を取りこぼさない。</h3>
-            <p>新しい注文はスタッフ画面に音と表示でお知らせ。待機中のキャストの人数や、卓ごとの経過時間・人数追加の時刻もひと目でわかります。</p>
-            <ul>
-              <li>注文の通知音。鳴らなかったときは理由まで記録</li>
-              <li>待機中の人数を、出勤数と客数から自動で表示</li>
-              <li>延長・人数追加・場内指名も、卓一覧から数タップ</li>
-            </ul>
-          </div>
-          <div class="vis">
-            <div class="card" aria-label="通知と待機人数のイメージ">
-              <span class="tag">スタッフ画面</span>
-              <div class="notif">
-                <div class="nt"><span class="ic"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 7a4 4 0 0 1 8 0v3l1.5 2h-11L4 10z"/><path d="M6.5 14a1.5 1.5 0 0 0 3 0"/></svg></span><span><b>8卓</b>　ハイボール ×3 ・ フルーツ盛り</span><span class="when num">23:02</span></div>
-                <div class="nt"><span class="ic"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 7a4 4 0 0 1 8 0v3l1.5 2h-11L4 10z"/><path d="M6.5 14a1.5 1.5 0 0 0 3 0"/></svg></span><span><b>5卓</b>　場内指名 キャストD</span><span class="when num">22:58</span></div>
-                <div class="nt held"><span class="ic"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 3v5l3 2"/><circle cx="8" cy="8" r="6"/></svg></span><span><b>3卓</b>　延長（ハーフ）</span><span class="when num">22:51</span></div>
-              </div>
-              <div class="stats">
-                <div><span>出勤</span><b class="num">12</b></div>
-                <div><span>店内の客数</span><b class="num">13</b></div>
-                <div><span>待機中</span><b class="num neg">−1</b></div>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <article class="ch" id="ch4" data-time="01:00" data-label="会計・閉店">
-          <div class="time"><span class="t">01:00</span><span>会計・閉店</span></div>
-          <div class="txt">
-            <h3>会計した瞬間に、<wbr>今日の売上ができあがる。</h3>
-            <p>会計するたびに、日次・月次の売上が自動で積み上がります。現金とカードの内訳、税、カード手数料も会計時に計算済み。閉店後に電卓を叩く時間はもう要りません。</p>
-            <ul>
-              <li>現金・カードの内訳と税を、会計と同時に計算</li>
-              <li>現金過不足をその場で確認</li>
-              <li>月次の収支・総利益まで自動で表示</li>
-            </ul>
-          </div>
-          <div class="vis">
-            <div class="card close-v" aria-label="会計伝票と週間売上のイメージ">
-              <div class="receipt">
-                <h4>5卓 会計</h4>
-                <div class="r"><span>セット料金 ×4</span><b>¥24,000</b></div>
-                <div class="r"><span>本指名 キャストB</span><b>¥3,000</b></div>
-                <div class="r"><span>場内指名 キャストD</span><b>¥2,000</b></div>
-                <div class="r"><span>シャンパン</span><b>¥30,000</b></div>
-                <div class="r"><span>ドリンク ×9</span><b>¥9,000</b></div>
-                <div class="r"><span>TAX 20%</span><b>¥13,600</b></div>
-                <div class="r t"><span>合計</span><b>¥81,600</b></div>
-              </div>
-              <div class="week">
-                <span style="font-size:10px;color:var(--dim)">今週の売上</span>
-                <div class="bars"><i style="--h:52%"></i><i style="--h:44%"></i><i style="--h:61%"></i><i style="--h:58%"></i><i style="--h:86%"></i><i class="today" style="--h:97%"></i><i style="--h:8%;opacity:.3"></i></div>
-                <div class="days"><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span><span>日</span></div>
-                <div class="sum"><span>本日 41組</span><b>¥1,284,000</b></div>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <article class="ch" id="ch5" data-time="01:10" data-label="締め完了">
-          <div class="time"><span class="t">01:10</span><span>締め完了</span></div>
-          <div class="txt">
-            <h3>キャストの給料も、<wbr>その場で確定。</h3>
-            <p>ドリンク・ボトル・指名料など、項目ごとに売上とバックを自動で計算。出勤・退勤の打刻から労働時間も反映されます。キャストは自分のスマホから、いつでも実績を確認できます。</p>
-            <ul>
-              <li>キャストごとにバック率を個別設定</li>
-              <li>会計のたびに給料の明細を記録。あとから設定を変えても過去分は動かない</li>
-              <li>キャストとスタッフで給料計算の画面を分離</li>
-            </ul>
-          </div>
-          <div class="vis">
-            <div class="card pay" aria-label="給料計算のイメージ">
-              <span class="tag">給料計算（本日）</span>
-              <div class="scroll">
-                <table>
-                  <thead><tr><th>キャスト</th><th>時給×時間</th><th>バック</th><th>日払い</th><th>残給</th></tr></thead>
-                  <tbody>
-                    <tr><td>キャストA</td><td>¥18,000</td><td class="g">¥18,400</td><td>¥10,000</td><td>¥26,400</td></tr>
-                    <tr><td>キャストB</td><td>¥15,000</td><td class="g">¥12,900</td><td>¥0</td><td>¥27,900</td></tr>
-                    <tr><td>キャストC</td><td>¥15,000</td><td class="g">¥9,700</td><td>¥5,000</td><td>¥19,700</td></tr>
-                    <tr><td>キャストD</td><td>¥12,000</td><td class="g">¥6,300</td><td>¥0</td><td>¥18,300</td></tr>
-                  </tbody>
-                </table>
-              </div>
-              <p class="done"><i>✓</i>本日の締めが完了しました</p>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <div class="stage-device" aria-hidden="true">
-        <div class="dev">
-          <div class="dev-hd">
-            <div><div class="rail" id="rail"><i class="on"></i><i></i><i></i><i></i><i></i></div><div class="dev-label" id="dev-label">来店・注文</div></div>
-            <div class="dev-time" id="dev-time">19:00</div>
-          </div>
-          <div class="dev-screen" id="dev-screen"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- VENUES -->
-  <section class="sec wrap" id="venues" aria-labelledby="v-t">
-    <div class="sec-hd">
-      <p class="kicker">対応業態</p>
-      <h2 id="v-t">夜の接客業、<wbr>どの業態にも。</h2>
-      <p>指名・場内指名・セット料金・同伴といった、夜の接客業特有の商習慣にあわせて設計しています。</p>
-    </div>
-    <div class="venues">
-      <div class="venue"><span class="no num">01</span><h3>キャバクラ</h3><p>指名・場内指名・セット料金の管理に対応。</p></div>
-      <div class="venue"><span class="no num">02</span><h3>ラウンジ</h3><p>同伴・フリー来店の売上を自動で仕分け。</p></div>
-      <div class="venue"><span class="no num">03</span><h3>クラブ</h3><p>複数キャストへの均等分配にも対応。</p></div>
-      <div class="venue"><span class="no num">04</span><h3>スナック</h3><p>少人数のお店でも、シンプルに運用できます。</p></div>
-    </div>
-  </section>
-
-  <!-- FEATURES -->
-  <section class="sec wrap" id="features" aria-labelledby="f-t">
-    <div class="sec-hd">
-      <p class="kicker">主な機能</p>
-      <h2 id="f-t">必要な機能を、<wbr>これ一本に。</h2>
-      <p>複雑な操作は必要ありません。スマホひとつで、注文から給料計算まで完結します。</p>
-    </div>
-    <div class="feats">
-      <div class="feat"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><path d="M14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2"/></svg><h3>POS・QR注文</h3><p>卓のQRから注文。複数キャストへの均等分配にも対応。</p></div>
-      <div class="feat"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><h3>日次・月次集計</h3><p>売上・現金過不足を自動計算。締め作業がほぼ不要に。</p></div>
-      <div class="feat"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg><h3>出勤・退勤打刻</h3><p>ワンタップで打刻。労働時間が給料計算に自動で連動。</p></div>
-      <div class="feat"><svg viewBox="0 0 24 24"><path d="M6 20v-1a6 6 0 0 1 12 0v1"/><circle cx="12" cy="8" r="4"/></svg><h3>キャストごとの給料</h3><p>項目別の売上とバックを自動計算。個別バック率にも対応。</p></div>
-      <div class="feat"><svg viewBox="0 0 24 24"><path d="M3 12h18M12 3v18"/><circle cx="12" cy="12" r="9"/></svg><h3>按分・ヘルプ</h3><p>本人・ヘルプ・場内・フリーで、売上の行き先を自動で振り分け。</p></div>
-      <div class="feat"><svg viewBox="0 0 24 24"><path d="M8 3h8l-1 5a3 3 0 0 1-6 0zM12 11v8M8 21h8"/></svg><h3>在庫管理</h3><p>ボトル・シャンパンの本数を、注文と連動して自動で減算。</p></div>
-      <div class="feat"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="1"/><path d="M8 21h8M8 9h3M8 13h6"/></svg><h3>卓・QR管理</h3><p>卓ごとの来店時刻・人数追加・指名者・料金をリアルタイムに表示。</p></div>
-      <div class="feat"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/><circle cx="18" cy="16" r="3"/><path d="M20.5 18.5L22 20"/></svg><h3>過去データもすぐ</h3><p>普段の動作は軽いまま、過去の伝票や売上も呼び出せます。</p></div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="sec wrap" id="pricing" aria-labelledby="pr-t">
-    <div class="sec-hd">
-      <p class="kicker">料金プラン</p>
-      <h2 id="pr-t">料金は、<wbr>シンプルな定額制。</h2>
-      <p>キャストの人数や卓の数で料金は変わりません。必要な機能はすべて最初から使えます。</p>
-    </div>
-    <div class="price">
-      <div class="plan">
-        <div class="nm"><h3>ULTIMA</h3><span>全機能込み</span></div>
-        <div class="amt"><span>導入費</span><b><span class="yen">¥</span><span class="fig" data-to="30000">30,000</span><small>初回のみ</small></b></div>
-        <div class="amt"><span>月額</span><b><span class="yen">¥</span><span class="fig" data-to="40000">40,000</span><small>/ 月</small></b></div>
-        <ul class="inc">
-          <li>注文・会計・卓管理</li>
-          <li>給料計算・按分・バック率設定</li>
-          <li>出勤管理・シフト</li>
-          <li>日次・月次の自動集計</li>
-          <li>初期設定のサポート</li>
-          <li>営業時間中の電話・チャット相談</li>
-        </ul>
-      </div>
-      <div class="side">
-        <p>メニューやバック率の初期設定は、打ち合わせのうえ私たちが行います。人数が増えても、機能を使い込んでも、月額は変わりません。</p>
-        <div class="cmp" aria-label="1日あたりの目安">
-          <span class="hd2">1日あたりの目安（月25日営業の場合）</span>
-          <span>月額 40,000円 ÷ 25日</span><b>約 1,600円 / 日</b>
-        </div>
-        <p class="note">料金の詳細やお見積もりは、資料請求・お問い合わせからお気軽にどうぞ。</p>
-        <div style="display:flex;flex-wrap:wrap;gap:12px">
-          <a class="btn btn-gold mag" href="document-request.html">資料をもらう</a>
-          <a class="btn btn-line" href="contact.html">見積もりを相談する</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FLOW -->
-  <section class="sec wrap" id="flow" aria-labelledby="fl-t">
-    <div class="sec-hd">
-      <p class="kicker">導入までの流れ</p>
-      <h2 id="fl-t">今日から、<wbr>最短3日で。</h2>
-      <p>難しい設定は不要です。打ち合わせで決めた内容を、こちらで設定してお渡しします。</p>
-    </div>
-    <ol class="flow">
-      <li><span class="st">1</span><span class="d">STEP 1</span><h3>資料のご案内</h3><p>お店の運営スタイルに合わせて、できることをご案内します。</p></li>
-      <li><span class="st">2</span><span class="d">STEP 2</span><h3>内容の打ち合わせ</h3><p>メニュー・バック率・按分の比率など、お店に合わせて初期設定を行います。</p></li>
-      <li><span class="st">3</span><span class="d">STEP 3</span><h3>導入・試運転</h3><p>最短3日、基本1週間で稼働開始。導入後もサポートが続きます。</p></li>
-    </ol>
-  </section>
-
-  <!-- SUPPORT -->
-  <section class="sec wrap" id="support" aria-labelledby="su-t">
-    <div class="support">
-      <div class="txt">
-        <p class="kicker">導入後サポート</p>
-        <h2 id="su-t" style="font-family:var(--f-display);font-weight:800;font-size:var(--s-xl);line-height:1.35;margin-top:18px">パソコンが苦手でも、<wbr>安心して。</h2>
-        <p style="color:var(--muted);margin-top:18px;max-width:30em">操作方法のご案内から、運用が始まってからのご相談まで。専任の担当が丁寧に対応します。</p>
-        <ul>
-          <li>導入時の初期設定をサポート</li>
-          <li>操作に迷ったときはすぐに相談可能</li>
-          <li>機能追加・改善のご要望も随時反映</li>
-        </ul>
-      </div>
-      <div class="hours" aria-label="サポートの対応時間帯のイメージ">
-        <h3>開店前から閉店後まで</h3>
-        <p>忙しい営業時間も、専任の担当がカバーします。</p>
-        <div class="bar"><i></i></div>
-        <div class="ax"><span>開店前</span><span>営業中</span><span>閉店後</span></div>
-        <div class="ch3"><span class="chip">電話でのご相談</span><span class="chip">チャットでのご相談</span><span class="chip">専任担当による個別対応</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="sec wrap" id="faq" aria-labelledby="fq-t">
-    <div class="sec-hd">
-      <p class="kicker">よくあるご質問</p>
-      <h2 id="fq-t">導入前に、<wbr>気になること。</h2>
-    </div>
-    <div class="faq">
-      <details><summary><span class="q">Q</span>パソコンやレジの専門知識がなくても使えますか？<span class="pm"></span></summary><p class="a">はい。スマートフォンやタブレットの基本操作ができれば、特別な知識は不要です。導入時に操作方法もご案内します。</p></details>
-      <details><summary><span class="q">Q</span>複数のキャストが指名された場合、売上はどう計算されますか？<span class="pm"></span></summary><p class="a">選ばれた人数で自動的に均等分配されます。手作業で割り算する必要はありません。フリーや場内の子が飲んだ分を指名者にどれだけ還元するかも、お店ごとに比率を設定できます。</p></details>
-      <details><summary><span class="q">Q</span>料金はいくらですか？<span class="pm"></span></summary><p class="a">導入費 30,000円、月額 40,000円の定額制です。キャストの人数や卓の数で料金は変わりません。</p></details>
-      <details><summary><span class="q">Q</span>導入までどれくらいの期間がかかりますか？<span class="pm"></span></summary><p class="a">お打ち合わせの内容にもよりますが、最短3日、基本は1週間ほどで稼働を開始いただけます。</p></details>
-      <details><summary><span class="q">Q</span>キャストとスタッフで、機能に違いはありますか？<span class="pm"></span></summary><p class="a">ご利用料金は人数にかかわらず定額です。給料計算の画面は、キャスト（歩合制）とスタッフ（時給制）で、それぞれの働き方に合わせて分かれています。</p></details>
-      <details><summary><span class="q">Q</span>通信環境が悪い場合、使えなくなりますか？<span class="pm"></span></summary><p class="a">インターネット接続が必要なクラウド型のサービスです。安定したWi-Fi環境でのご利用をおすすめしています。</p></details>
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section class="sec wrap" id="contact" aria-labelledby="ct-t">
-    <div class="sec-hd">
-      <p class="kicker">お問い合わせ</p>
-      <h2 id="ct-t">まずは、<wbr>お気軽にご相談ください。</h2>
-    </div>
-    <div class="contact">
-      <a class="ct" href="contact.html"><span class="tg">無料</span><h3>オンライン相談</h3><p>画面を見ながら、その場でご質問にお答えします。</p><span class="btn btn-line">オンライン相談を申し込む</span></a>
-      <a class="ct" href="contact.html"><span class="tg">お気軽に</span><h3>お問い合わせ</h3><p>導入のご相談・お見積もりのご依頼など。</p><span class="btn btn-line">お問い合わせ</span></a>
-      <a class="ct main" href="document-request.html"><span class="tg">無料配布</span><h3>資料請求</h3><p>機能・料金プランをまとめた資料をお届けします。</p><span class="btn btn-gold">資料をもらう</span></a>
-    </div>
-  </section>
-
-  <!-- DAWN -->
-  <section class="dawn wrap" id="dawn" aria-labelledby="dw-t">
-    <p class="t num">05:00 — 夜明け</p>
-    <h2 id="dw-t">今日から、<wbr>もっとシンプルな<wbr>店舗管理へ。</h2>
-    <p>難しい設定は必要ありません。パソコンが苦手なオーナー様でも、すぐにお使いいただけます。</p>
-    <div class="acts">
-      <a class="btn btn-gold mag" href="document-request.html">資料を請求する</a>
-      <a class="btn btn-line" href="contact.html">無料で相談する</a>
-    </div>
-  </section>
-</main>
-
-<footer>
-  <div class="wrap">
-    <div class="row">
-      <a class="logo" href="#top"><span class="dot"></span>ULTIMA</a>
-      <nav aria-label="フッター"><a href="#features">機能</a><a href="#pricing">料金</a><a href="#flow">導入について</a><a href="#faq">よくあるご質問</a><a href="contact.html">お問い合わせ</a></nav>
-    </div>
-    <small>© ULTIMA ― キャバクラ向け総合店舗管理サービス</small>
+<section id="pricing" data-hud="pricing">
+  <div class="th"><h2>料金と導入</h2><span class="en">pricing — flat rate</span></div>
+  <div class="tgrid">
+    <article class="tcard rv">
+      <div class="sheen"></div>
+      <span class="ttag">setup — one time</span>
+      <h3 class="ttl">導入費 ¥30,000</h3>
+      <p class="td">初回のみ。初期設定と使い方の説明を含みます。</p>
+      <span class="gl">導</span>
+    </article>
+    <article class="tcard rv">
+      <div class="sheen"></div>
+      <span class="ttag">monthly</span>
+      <h3 class="ttl">月額 ¥40,000</h3>
+      <p class="td">1店舗あたり。注文・会計・給料計算・出勤管理・売上集計のすべてを含みます。</p>
+      <span class="gl">月</span>
+    </article>
+    <article class="tcard rv">
+      <div class="sheen"></div>
+      <span class="ttag">go live</span>
+      <h3 class="ttl">最短3日で稼働</h3>
+      <p class="td">お申し込み → 初期設定 → 店舗での説明。基本は1週間。</p>
+      <span class="gl">日</span>
+    </article>
   </div>
-  <div class="giant" aria-hidden="true">ULTIMA</div>
+  <div class="biz rv"><span class="en">対応業態</span><div class="chips"><span>キャバクラ</span><span>ラウンジ</span><span>クラブ</span><span>スナック</span></div></div>
+</section>
+
+<section id="support" data-hud="support">
+  <div class="pgrid">
+    <div class="rv">
+      <span class="en">support</span>
+      <h2 class="pname">パソコンが苦手でも。</h2>
+      <p class="prole">電話 / チャット / 専任担当</p>
+    </div>
+    <div class="pbio rv">
+      <p>操作方法のご案内から、運用が始まってからのご相談まで。専任の担当が丁寧に対応します。</p>
+      <ul>
+        <li>導入時の初期設定をサポート</li>
+        <li>操作に迷ったときはすぐに相談可能</li>
+        <li>機能追加・改善のご要望も随時反映</li>
+      </ul>
+      <p class="ssub">開店前から閉店後まで</p>
+      <p>忙しい営業時間も、専任の担当がカバーします。</p>
+      <div class="faq">
+        <h3>faq — よくあるご質問</h3>
+        <details><summary><b>Q</b>パソコンやレジの専門知識がなくても使えますか？</summary><p>はい。スマートフォンやタブレットの基本操作ができれば、特別な知識は不要です。導入時に操作方法もご案内します。</p></details>
+        <details><summary><b>Q</b>複数のキャストが指名された場合、売上はどう計算されますか？</summary><p>選ばれた人数で自動的に均等分配されます。手作業で割り算する必要はありません。フリーや場内の子が飲んだ分を指名者にどれだけ還元するかも、お店ごとに比率を設定できます。</p></details>
+        <details><summary><b>Q</b>料金はいくらですか？</summary><p>導入費 30,000円、月額 40,000円の定額制です。キャストの人数や卓の数で料金は変わりません。</p></details>
+        <details><summary><b>Q</b>導入までどれくらいの期間がかかりますか？</summary><p>お打ち合わせの内容にもよりますが、最短3日、基本は1週間ほどで稼働を開始いただけます。</p></details>
+        <details><summary><b>Q</b>キャストとスタッフで、機能に違いはありますか？</summary><p>ご利用料金は人数にかかわらず定額です。給料計算の画面は、キャスト（歩合制）とスタッフ（時給制）で、それぞれの働き方に合わせて分かれています。</p></details>
+        <details><summary><b>Q</b>通信環境が悪い場合、使えなくなりますか？</summary><p>インターネット接続が必要なクラウド型のサービスです。安定したWi-Fi環境でのご利用をおすすめしています。</p></details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" data-hud="contact">
+  <span class="en">contact</span>
+  <h2 class="rv">まずは、<em>話す</em>ところから。</h2>
+  <a class="mega rv" id="mega" href="document-request.html">資料をもらう ↗</a>
+  <a class="xnote" href="contact.html">無料相談はこちら →</a>
+</section>
+
+<footer data-hud="ultima">
+  <div class="flogo" id="flogo">ULTIMA</div>
+  <div class="fmeta">
+    <span>© <span id="y"></span> <span class="bn">ULTIMA</span> — キャバクラ向け総合店舗管理サービス</span>
+    <span><a href="document-request.html">資料請求</a> / <a href="contact.html">お問い合わせ</a></span>
+  </div>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
-(() => {
-const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const desktop = () => matchMedia("(min-width: 981px)").matches;
-document.documentElement.classList.add("js");
-const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
-const ease = t => 1 - Math.pow(1 - t, 3);
+(function(){
+  var d=document, w=window, root=d.documentElement;
+  var $=function(q){return d.querySelector(q);};
+  var $$=function(q){return [].slice.call(d.querySelectorAll(q));};
+  d.getElementById('y').textContent=new Date().getFullYear();
 
-/* header */
-const hd = document.getElementById("hd");
-const onS = () => hd.classList.toggle("solid", scrollY > 40);
-addEventListener("scroll", onS, { passive: true }); onS();
+  var reduce=w.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var mob=w.matchMedia('(max-width:760px)').matches;
+  var coarse=w.matchMedia('(pointer:coarse)').matches;
 
-/* ── sound: demo order chime, only after the visitor turns it on ── */
-const snd = document.getElementById("snd");
-let actx = null, soundOn = false;
-try { soundOn = localStorage.getItem("ultima-demo-sound") === "1"; } catch (e) {}
-const chime = () => {
-  if (!soundOn || !actx) return;
-  const t = actx.currentTime;
-  [[1046.5, 0], [1318.5, .14]].forEach(([f, d]) => {
-    const o = actx.createOscillator(), g = actx.createGain();
-    o.type = "sine"; o.frequency.value = f;
-    g.gain.setValueAtTime(.0001, t + d); g.gain.exponentialRampToValueAtTime(.16, t + d + .02); g.gain.exponentialRampToValueAtTime(.0001, t + d + .5);
-    o.connect(g); g.connect(actx.destination); o.start(t + d); o.stop(t + d + .55);
-  });
-};
-const setSound = on => {
-  soundOn = on; snd.setAttribute("aria-pressed", on ? "true" : "false");
-  try { localStorage.setItem("ultima-demo-sound", on ? "1" : "0"); } catch (e) {}
-};
-snd.addEventListener("click", () => {
-  try { if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); actx.resume(); } catch (e) {}
-  setSound(!soundOn); if (soundOn) chime();
-});
-// a stored "on" only takes effect after the first click (browsers require a gesture)
-snd.setAttribute("aria-pressed", "false"); soundOn = false;
+  function clamp01(v){return Math.min(Math.max(v,0),1);}
+  function sm(t){t=clamp01(t);return t*t*(3-2*t);}
+  function hsh(n){var x=Math.sin(n)*43758.5453;return x-Math.floor(x);}
+  function pad3(n){var s=''+n;while(3>s.length){s='0'+s;}return s;}
 
-/* ── hero: clearing the counter ── */
-const pin = document.getElementById("hero-pin"), scene = document.getElementById("scene"), heroEl = document.querySelector(".hero");
-const heroProgress = () => {
-  if (!desktop() || reduce) return 1;
-  const r = pin.getBoundingClientRect(); return clamp(-r.top / Math.max(1, pin.offsetHeight - innerHeight));
-};
-let heroLive = false;
-const hero = () => {
-  const p = heroProgress();
-  const s = ease(clamp(p / .32)), g = ease(clamp((p - .06) / .5)), t = ease(clamp((p - .22) / .5)), f = ease(clamp((p - .55) / .35));
-  heroEl.style.setProperty("--p", p.toFixed(3));
-  heroEl.style.setProperty("--s", s.toFixed(3));
-  scene.style.setProperty("--p", p.toFixed(3));
-  heroLive = true;
-};
-addEventListener("scroll", hero, { passive: true }); addEventListener("resize", hero); hero();
-
-/* ── particle field ── */
-(() => {
-  const cv = document.getElementById("field"); if (!cv) return;
-  const cx = cv.getContext("2d"), sysN = document.getElementById("sys-n"), sysL = document.getElementById("sys-l");
-  const small = matchMedia("(max-width: 860px)").matches, N = small ? 1800 : 4200;
-  const COLS = ["#e8c98e","#e8c98e","#e8c98e","#c9a15c","#fff1d2","#7fc6b3","#9b8cc4"];
-  const P = [];
-  for (let i = 0; i < N; i++) {
-    const k = i + .5, phi = Math.acos(1 - 2 * k / N), th = Math.PI * (1 + Math.sqrt(5)) * k;
-    P.push({ sx: Math.cos(th) * Math.sin(phi), sy: Math.cos(phi), sz: Math.sin(th) * Math.sin(phi),
-      cx: (Math.random() * 2 - 1) * 2.2, cy: (Math.random() * 2 - 1) * 1.3, cz: (Math.random() * 2 - 1) * 1.2,
-      c: COLS[(Math.random() * COLS.length) | 0], s: Math.random() * 1.3 + .5, ph: Math.random() * 6.28 });
+  /* ---------- loader ---------- */
+  var ldn=d.getElementById('ldn'), ldb=d.getElementById('ldb');
+  if(reduce){
+    root.classList.add('loaded');
+  }else{
+    setTimeout(function(){root.classList.add('loaded');},1900); /* safety: never leave the loader up */
+    var t0=performance.now();
+    (function cnt(){
+      var t=performance.now()-t0;
+      var v=sm(t/1250);
+      ldn.textContent=Math.floor(v*100);
+      ldb.style.transform='scaleX('+v.toFixed(3)+')';
+      if(1250>t){requestAnimationFrame(cnt);}
+      else{root.classList.add('loaded');setTimeout(layout,650);}
+    })();
   }
-  let W = 0, H = 0, dpr = 1, rotY = 0, rotX = -.25, vy = .0016, drag = null, ripples = [], m = 0, intro = 0;
-  const size = () => { dpr = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr; };
-  size(); addEventListener("resize", size);
-  cv.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, moved: 0 }; cv.setPointerCapture(e.pointerId); });
-  cv.addEventListener("pointermove", e => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY; drag.moved += Math.abs(dx) + Math.abs(dy); rotY += dx * .005; rotX = clamp(rotX + dy * .004, -1.2, 1.2) ; vy = dx * .0008; });
-  cv.addEventListener("pointerup", e => { if (drag && drag.moved < 6) { const r = cv.getBoundingClientRect(); ripples.push({ x: e.clientX - r.left, y: e.clientY - r.top, t: performance.now() }); if (typeof chime === "function") chime(); } drag = null; });
-  const t0 = performance.now();
-  const frame = now => {
-    requestAnimationFrame(frame);
-    if (document.hidden) return;
-    const r = cv.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
-    intro = Math.min(1, (now - t0) / 1800);
-    const target = (desktop() && !reduce) ? clamp(heroProgress() / .6) : clamp(-r.top / (H * .6));
-    m += (target - m) * .08; const e = ease(m);
-    if (!drag) { rotY += vy; vy += (.0016 - vy) * .02; }
-    const t = now / 1000, cyc = Math.cos(rotY), syc = Math.sin(rotY), cxr = Math.cos(rotX), sxr = Math.sin(rotX);
-    const R = Math.min(W, H) * (small ? .34 : .36), ox = W * (small ? .5 : .66 - e * .06), oy = H * (small ? .62 : .52), fov = 3.2;
-    cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, W, H);
-    ripples = ripples.filter(q => now - q.t < 1600);
-    for (const p of P) {
-      const n = (1 - e) * .08;
-      let x = p.cx + (p.sx - p.cx) * e + Math.sin(t * .6 + p.ph) * n, y = p.cy + (p.sy - p.cy) * e + Math.cos(t * .5 + p.ph) * n, z = p.cz + (p.sz - p.cz) * e;
-      let X = x * cyc - z * syc, Z = x * syc + z * cyc; let Y = y * cxr - Z * sxr; Z = y * sxr + Z * cxr;
-      const k = fov / (fov + Z), sxp = ox + X * R * k, syp = oy + Y * R * k;
-      let px = sxp, py = syp;
-      for (const q of ripples) { const age = (now - q.t) / 1000, d = Math.hypot(sxp - q.x, syp - q.y), w = age * 520 - d; if (w > 0 && w < 90) { const a = Math.sin(w / 90 * Math.PI) * 22 * (1 - age / 1.6); px += (sxp - q.x) / (d || 1) * a; py += (syp - q.y) / (d || 1) * a; } }
-      const al = (small ? .62 : 1) * intro * Math.max(.18, Math.min(1, (1.8 - Z) / 2)) * (.55 + .45 * Math.sin(t * 2 + p.ph * 3) ** 2);
-      cx.globalAlpha = al; cx.fillStyle = p.c; const sz = p.s * k * (small ? 1.05 : 1.9);
-      cx.fillRect(px, py, sz, sz);
+
+  /* ---------- reveal ---------- */
+  var targets=$$('.rv');
+  function showAll(){var i=0;for(;i!==targets.length;i++){targets[i].classList.add('on');}}
+  if(reduce||!('IntersectionObserver' in w)){
+    showAll();
+  }else{
+    var io=new IntersectionObserver(function(es){
+      var i=0;
+      for(;i!==es.length;i++){
+        if(es[i].isIntersecting){es[i].target.classList.add('on');io.unobserve(es[i].target);}
+      }
+    },{threshold:.14,rootMargin:'0px 0px -6% 0px'});
+    var i0=0;for(;i0!==targets.length;i0++){io.observe(targets[i0]);}
+    setTimeout(showAll,2400);
+  }
+
+  /* ---------- HUD section name ---------- */
+  var hudn=d.getElementById('hudn');
+  if('IntersectionObserver' in w){
+    var io2=new IntersectionObserver(function(es){
+      var i=0;
+      for(;i!==es.length;i++){
+        if(es[i].isIntersecting){hudn.textContent=es[i].target.getAttribute('data-hud');}
+      }
+    },{rootMargin:'-45% 0px -45% 0px',threshold:0});
+    $$('[data-hud]').forEach(function(s){io2.observe(s);});
+  }
+
+  /* ================= particle field ================= */
+  var cv=d.getElementById('field');
+  var ctx=cv.getContext('2d');
+  var W=0,H=0,K=1,docH=4000;
+  var N=mob?3200:6000;
+  var P=new Float32Array(N*3);
+  var TA=new Float32Array(N*3);
+  var TB=new Float32Array(N*3);
+  var TC=new Float32Array(N*3);
+  var TW=new Float32Array(N*3);
+  var TT=new Float32Array(N*3);
+  var i=0;
+  var wcols=Math.ceil(Math.sqrt(N*1.8));
+  for(;i!==N;i++){
+    var i3=i*3;
+    /* chaos */
+    var th=hsh(i*1.3)*6.283, ph=Math.acos(2*hsh(i*2.1)-1);
+    var rr=Math.cbrt(hsh(i*3.7))*1.12+(hsh(i*5.1)-.5)*.3;
+    TA[i3]=Math.sin(ph)*Math.cos(th)*rr*1.3;
+    TA[i3+1]=Math.cos(ph)*rr*.85;
+    TA[i3+2]=Math.sin(ph)*Math.sin(th)*rr;
+    /* sphere */
+    var yk=1-(i/(N-1))*2;
+    var rad=Math.sqrt(Math.max(0,1-yk*yk));
+    var ga2=i*2.39996;
+    TB[i3]=Math.cos(ga2)*rad*.88;
+    TB[i3+1]=yk*.88;
+    TB[i3+2]=Math.sin(ga2)*rad*.88;
+    /* torus */
+    var u=i*2.39996, v=hsh(i*7.7)*6.283;
+    var R=.76, r2=.3;
+    var tx=(R+r2*Math.cos(v))*Math.cos(u);
+    var ty=r2*Math.sin(v);
+    var tz=(R+r2*Math.cos(v))*Math.sin(u);
+    var c9=Math.cos(.9), s9=Math.sin(.9);
+    TC[i3]=tx;TC[i3+1]=ty*c9-tz*s9;TC[i3+2]=ty*s9+tz*c9;
+    /* wave plain */
+    var wc=i%wcols, wr=Math.floor(i/wcols);
+    var wx=(wc/wcols-.5)*3.4;
+    var wz=(wr/(N/wcols)-.5)*2.2;
+    TW[i3]=wx;
+    TW[i3+1]=.16*Math.sin(wx*2.6)*Math.cos(wz*3.1)+.1;
+    TW[i3+2]=wz;
+    P[i3]=TA[i3];P[i3+1]=TA[i3+1];P[i3+2]=TA[i3+2];
+  }
+  /* dot-matrix brand word */
+  function buildText(){
+    var oc=d.createElement('canvas');
+    oc.width=900;oc.height=230;
+    var o=oc.getContext('2d');
+    o.fillStyle='#fff';
+    o.font='italic 900 175px "Noto Serif JP", Georgia, serif';
+    o.fillText('ULTIMA',20,172);
+    var img=o.getImageData(0,0,900,230).data;
+    var pts=[];var wmax=Math.min(900,o.measureText('ULTIMA').width+40);
+    var y2=0;
+    for(;230>y2;y2+=3){
+      var x2=0;
+      for(;900>x2;x2+=3){
+        if(img[(y2*900+x2)*4+3]>120){pts.push([(x2-wmax*.5)/260,(y2-118)/260]);}
+      }
     }
-    cx.globalAlpha = 1;
-    const pct = Math.round(e * 100); sysN.textContent = String(pct).padStart(3, "0"); sysL.textContent = pct >= 98 ? "ULTIMA" : pct > 40 ? "整理中" : "散らかった伝票";
-  };
-  requestAnimationFrame(frame);
+    var M=pts.length;
+    if(M>0===false){return;}
+    var j=0;
+    for(;j!==N;j++){
+      var k=(j*2654435761)%M;
+      var j3=j*3;
+      TT[j3]=pts[k][0]+(hsh(j*4.4)-.5)*.018;
+      TT[j3+1]=pts[k][1]+(hsh(j*6.6)-.5)*.018;
+      TT[j3+2]=(hsh(j*9.3)-.5)*.1;
+    }
+  }
+  buildText();
+  if(d.fonts&&d.fonts.ready){d.fonts.ready.then(function(){buildText();layout();});}
+
+  /* 8 steps violet -> gold */
+  var cols=[];
+  var b=0;
+  for(;b!==8;b++){
+    var t=b/7;
+    cols.push('rgb('+Math.round(120+112*t)+','+Math.round(110+91*t)+','+Math.round(170-28*t)+')');
+  }
+
+  var TGT=[TA,TB,TC,TW,TT];
+  var KEYS=[0,800,2400,4200,6000];
+  var ry=0,rx=-.18,rxT=-.18,rotV=0;
+  var mx=0,my=0,pmxL=0;
+  var drag=false,dx0=0,dy0=0,moved=0;
+  var sh={x:0,y:0,t:9};
+  var T=0;
+
+  var stmtEl=d.getElementById('stmt'), hwrapEl=d.getElementById('night'),
+      workEl=d.getElementById('features'), footEl=d.querySelector('footer');
+
+  function layout(){
+    docH=root.scrollHeight;
+    KEYS[0]=0;
+    KEYS[1]=Math.max(1,stmtEl.offsetTop-H*.25);
+    KEYS[2]=hwrapEl.offsetTop+Math.max(0,hwrapEl.offsetHeight-H)*.5;
+    KEYS[3]=workEl.offsetTop+workEl.offsetHeight*.35;
+    KEYS[4]=footEl.offsetTop-H*.6;
+    var q=1;
+    for(;q!==5;q++){
+      if(KEYS[q-1]+10>KEYS[q]){KEYS[q]=KEYS[q-1]+10;}
+    }
+    measureTrack();
+  }
+
+  function sizeCanvas(){
+    var dpr=Math.min(w.devicePixelRatio||1,1.6);
+    W=w.innerWidth;H=w.innerHeight;
+    cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    K=Math.min(W,H)*.36;
+  }
+
+  function drawField(scS){
+    ctx.clearRect(0,0,W,H);
+    /* chaos -> sphere -> torus -> wave -> brand word */
+    var seg=0;
+    var q=1;
+    for(;q!==5;q++){
+      if(scS>KEYS[q]){seg=q;}
+    }
+    if(seg>3){seg=3;}
+    var src=TGT[seg], dst=TGT[seg+1];
+    var f=sm((scS-KEYS[seg])/(KEYS[seg+1]-KEYS[seg]));
+    if(reduce){src=TB;dst=TB;f=0;seg=0;}
+    var wW=0;
+    if(seg===2){wW=f;}
+    if(seg===3){wW=1-f;}
+    var txtW=(seg===3)?f:0;
+    if(scS>KEYS[4]){txtW=1;}
+
+    var pmx=(mx/W-.5), pmy=(my/H-.5);
+    var RY=(ry+pmx*.3)*(1-txtW), RX=(rx+pmy*.2)*(1-txtW)+(-.04*txtW);
+    var cX=Math.cos(RX), sX=Math.sin(RX);
+    var cY=Math.cos(RY), sY=Math.sin(RY);
+    var persp=2.6;
+    var shA=1>sh.t;
+    ctx.globalCompositeOperation='lighter';
+    ctx.globalAlpha=.88;
+    var bI=0;
+    for(;bI!==8;bI++){
+      ctx.fillStyle=cols[bI];
+      var j=bI;
+      for(;N>j;j+=8){
+        var j3=j*3;
+        var gx=src[j3]+(dst[j3]-src[j3])*f;
+        var gy=src[j3+1]+(dst[j3+1]-src[j3+1])*f;
+        var gz=src[j3+2]+(dst[j3+2]-src[j3+2])*f;
+        if(wW>0){gy+=wW*.15*Math.sin(gx*2.6+T*1.5)*Math.cos(gz*3.1-T*.9);}
+        P[j3]+=(gx-P[j3])*.07;
+        P[j3+1]+=(gy-P[j3+1])*.07;
+        P[j3+2]+=(gz-P[j3+2])*.07;
+        var x=P[j3], y=P[j3+1], z=P[j3+2];
+        var y1=y*cX-z*sX, z1=y*sX+z*cX;
+        var x2=x*cY+z1*sY, z2=-x*sY+z1*cY;
+        var s=persp/(persp-z2);
+        var sx=W*.5+x2*s*K;
+        var sy=H*.44+y1*s*K;
+        var sz=(mob?1.25:1.45)*s;
+        if(shA){
+          var dxs=sx-sh.x, dys=sy-sh.y;
+          var ds=Math.sqrt(dxs*dxs+dys*dys)+.001;
+          var RR=sh.t*Math.max(W,H);
+          var g=Math.exp(-(ds-RR)*(ds-RR)/26000)*(1-sh.t);
+          sx+=dxs/ds*g*32;
+          sy+=dys/ds*g*32;
+          sz*=1+g*1.6;
+        }
+        ctx.fillRect(sx,sy,sz,sz);
+      }
+    }
+    if(shA){
+      ctx.globalAlpha=(1-sh.t)*.4;
+      ctx.strokeStyle='#e8c98e';
+      ctx.lineWidth=1;
+      ctx.beginPath();
+      ctx.arc(sh.x,sh.y,sh.t*Math.max(W,H),0,6.283);
+      ctx.stroke();
+    }
+    ctx.globalCompositeOperation='source-over';
+    ctx.globalAlpha=1;
+  }
+
+  /* drag rotate / tap ripple */
+  if(!reduce){
+    w.addEventListener('pointerdown',function(e){
+      if(e.target.closest('a,button')){return;}
+      drag=true;moved=0;dx0=e.clientX;dy0=e.clientY;
+    },{passive:true});
+    w.addEventListener('pointermove',function(e){
+      mx=e.clientX;my=e.clientY;
+      if(!drag){return;}
+      var dx=e.clientX-dx0, dy=e.clientY-dy0;
+      moved+=Math.abs(dx)+Math.abs(dy);
+      if(Math.abs(dx)>Math.abs(dy)*.7){rotV+=dx*.0004;}
+      if(!coarse){
+        rxT+=dy*.003;
+        if(rxT>1.1){rxT=1.1;}
+        if(-1.1>rxT){rxT=-1.1;}
+      }
+      dx0=e.clientX;dy0=e.clientY;
+    },{passive:true});
+    w.addEventListener('pointerup',function(e){
+      if(drag&&7>moved&&!e.target.closest('a,button,.row2,.tcard')){
+        sh={x:e.clientX,y:e.clientY,t:0};
+      }
+      drag=false;
+    },{passive:true});
+  }
+
+  /* ---------- statement ---------- */
+  var lines=$$('.stmt .line').map(function(el){
+    return {el:el,b:el.querySelector('b'),dx:parseFloat(el.getAttribute('data-dx'))||0};
+  });
+
+  /* ---------- pinned horizontal ---------- */
+  var htrack=d.getElementById('htrack'), hbi=d.getElementById('hbi');
+  var panels=$$('.panel');
+  var pnums=panels.map(function(p){return p.querySelector('.pnum');});
+  var usePin=!mob&&!reduce;
+  var trackMax=0;
+  function measureTrack(){trackMax=Math.max(0,htrack.scrollWidth-W+W*.12);}
+
+  /* ---------- cursor / magnet / tilt / preview ---------- */
+  var cur=d.getElementById('cur'), curR=d.getElementById('curR');
+  var cx=0,cy=0,rxc=0,ryc=0;
+  if(!coarse){
+    d.addEventListener('mouseover',function(e){
+      if(e.target.closest('a,button,.row2,.tcard,.mega,.hcta')){root.classList.add('curbig');}
+      else{root.classList.remove('curbig');}
+    });
+  }
+  var mega=d.getElementById('mega');
+  function magnet(){
+    if(coarse||!mega){return;}
+    var r=mega.getBoundingClientRect();
+    var inX=mx>r.left-70&&r.right+70>mx;
+    var inY=my>r.top-70&&r.bottom+70>my;
+    if(inX&&inY){
+      var tx=(mx-(r.left+r.width*.5))*.28;
+      var ty=(my-(r.top+r.height*.5))*.34;
+      if(tx>18){tx=18;}if(-18>tx){tx=-18;}
+      if(ty>14){ty=14;}if(-14>ty){ty=-14;}
+      mega.style.transform='translate3d('+tx.toFixed(1)+'px,'+ty.toFixed(1)+'px,0)';
+    }else if(mega.style.transform!==''){mega.style.transform='';}
+  }
+  if(!coarse&&!reduce){
+    $$('.tcard').forEach(function(card){
+      card.addEventListener('pointermove',function(e){
+        var r=card.getBoundingClientRect();
+        var xn=(e.clientX-r.left)/r.width, yn=(e.clientY-r.top)/r.height;
+        card.style.transform='perspective(900px) rotateX('+((.5-yn)*7).toFixed(2)+'deg) rotateY('+((xn-.5)*9).toFixed(2)+'deg)';
+        card.style.setProperty('--mx',(xn*100).toFixed(1)+'%');
+        card.style.setProperty('--my',(yn*100).toFixed(1)+'%');
+      });
+      card.addEventListener('pointerleave',function(){card.style.transform='';});
+    });
+  }
+  var prev=d.getElementById('prev'), pvs=d.getElementById('pvs'), wlist=d.getElementById('wlist');
+  var pvx=0,pvy=0,pvr=0;
+  if(!coarse&&!reduce){
+    $$('.row2').forEach(function(row){
+      row.addEventListener('pointerenter',function(){
+        pvs.style.transform='translateY(-'+(parseInt(row.getAttribute('data-pv'),10)*20)+'%)';
+        prev.classList.add('show');
+      });
+    });
+    wlist.addEventListener('pointerleave',function(){prev.classList.remove('show');});
+  }
+
+  /* ---------- velocity skew ---------- */
+  var skewEls=[d.getElementById('h1'),stmtEl,wlist,d.getElementById('flogo')];
+  var velS=0,lastS=0;
+
+  /* ---------- HUD ---------- */
+  var hudp=d.getElementById('hudp'), pbi=d.getElementById('pbi'), lastP=-1;
+
+  /* ---------- master loop ---------- */
+  function tick(){
+    if(!d.hidden){
+      var scS=w.pageYOffset||root.scrollTop;
+      T+=.016;
+      velS+=((scS-lastS)-velS)*.12;
+      lastS=scS;
+      ry+=.0016+rotV;
+      rotV*=.94;
+      rx+=(rxT-rx)*.08;
+      if(1>sh.t){sh.t+=.045;}
+      drawField(scS);
+      /* statement scrub + drift */
+      var li=0;
+      for(;li!==lines.length;li++){
+        var L=lines[li];
+        var r=L.el.getBoundingClientRect();
+        if(r.top>H+60){L.b.style.clipPath='inset(0 100% 0 0)';continue;}
+        if(-60>r.bottom){L.b.style.clipPath='inset(0 0% 0 0)';continue;}
+        var pr=clamp01((H*.82-r.top)/(H*.55));
+        L.b.style.clipPath='inset(0 '+((1-pr)*100).toFixed(2)+'% 0 0)';
+        var c=(r.top+r.height*.5-H*.5)/H;
+        L.el.style.transform='translateX('+(c*L.dx*-28).toFixed(1)+'px)';
+      }
+      /* pin */
+      if(usePin){
+        var rw=hwrapEl.getBoundingClientRect();
+        var den=rw.height-H;
+        if(den>0){
+          var prg=clamp01(-rw.top/den);
+          htrack.style.transform='translate3d(-'+(prg*trackMax).toFixed(1)+'px,0,0)';
+          hbi.style.transform='scaleX('+prg.toFixed(3)+')';
+          var pi=0;
+          for(;pi!==panels.length;pi++){
+            if(prg>pi*.26){panels[pi].classList.add('on');}
+            pnums[pi].style.transform='translate3d('+(-prg*90).toFixed(1)+'px,0,0)';
+          }
+        }
+      }
+      /* velocity skew */
+      var deg=velS*.05;
+      if(deg>4){deg=4;}
+      if(-4>deg){deg=-4;}
+      var si=0;
+      for(;si!==skewEls.length;si++){
+        if(Math.abs(deg)>.04){skewEls[si].style.transform='skewY('+deg.toFixed(2)+'deg)';}
+        else if(skewEls[si].style.transform!==''){skewEls[si].style.transform='';}
+      }
+      /* HUD */
+      var p=clamp01(scS/(docH-H));
+      var pc=Math.round(p*100);
+      if(pc!==lastP){lastP=pc;hudp.textContent=pad3(pc);pbi.style.transform='scaleX('+p.toFixed(3)+')';}
+      /* cursor + preview */
+      if(!coarse){
+        cx+=(mx-cx)*.3;cy+=(my-cy)*.3;
+        rxc+=(mx-rxc)*.13;ryc+=(my-ryc)*.13;
+        cur.style.transform='translate(-50%,-50%) translate3d('+cx.toFixed(1)+'px,'+cy.toFixed(1)+'px,0)';
+        curR.style.transform='translate(-50%,-50%) translate3d('+rxc.toFixed(1)+'px,'+ryc.toFixed(1)+'px,0)';
+        pvx+=(mx+30-pvx)*.16;pvy+=(my+26-pvy)*.16;
+        pvr+=((mx-pmxL)*.55-pvr)*.1;
+        if(pvr>10){pvr=10;}if(-10>pvr){pvr=-10;}
+        pmxL=mx;
+        prev.style.transform='translate3d('+pvx.toFixed(1)+'px,'+pvy.toFixed(1)+'px,0) rotate('+pvr.toFixed(2)+'deg)';
+        magnet();
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function onResize(){
+    mob=w.matchMedia('(max-width:760px)').matches;
+    usePin=!mob&&!reduce;
+    sizeCanvas();
+    layout();
+    if(reduce){staticFrame();}
+  }
+  w.addEventListener('resize',onResize);
+  w.addEventListener('load',layout);
+
+  function staticFrame(){
+    ry=.6;rx=-.22;
+    var i2=0;
+    for(;i2!==N*3;i2++){P[i2]=TB[i2];}
+    drawField(0);
+  }
+
+  sizeCanvas();
+  layout();
+  if(reduce){
+    staticFrame();
+    w.addEventListener('scroll',function(){
+      var p=clamp01((w.pageYOffset||0)/(docH-H));
+      hudp.textContent=pad3(Math.round(p*100));
+      pbi.style.transform='scaleX('+p.toFixed(3)+')';
+    },{passive:true});
+  }else{
+    requestAnimationFrame(tick);
+  }
 })();
 
-/* hero tablet: a quiet live loop once it is on screen */
-const toast = document.getElementById("toast"), toastT = document.getElementById("toast-t"), t8 = document.getElementById("t8"), wait = document.getElementById("wait"), tbs = document.querySelectorAll(".tables .tb");
-const ping = el => { el.classList.remove("ping"); void el.offsetWidth; el.classList.add("ping"); };
-const show = t => { toastT.textContent = t; toast.classList.add("show"); chime(); setTimeout(() => toast.classList.remove("show"), 2300); };
-const events = [
-  () => { t8.classList.add("on"); t8.querySelector(".tm").textContent = "20:48"; t8.querySelector(".who").textContent = "フリー・1名"; wait.textContent = "2"; ping(t8); },
-  () => { show("8卓・ご注文を送信しました"); ping(t8); },
-  () => { show("5卓・場内指名 キャストD"); ping(tbs[4]); },
-  () => { show("1卓・シャンパンのご注文"); ping(tbs[0]); },
-  () => { t8.classList.remove("on"); t8.querySelector(".tm").textContent = "—"; t8.querySelector(".who").textContent = "空席"; wait.textContent = "3"; }
-];
-if (!reduce) { let k = 0; const step = () => { if (heroLive && scrollY < innerHeight * 3) { events[k % events.length](); k++; } setTimeout(step, 3200); }; setTimeout(step, 1200); }
-else { toast.classList.add("show"); }
-
-/* ── night stage: one device, chapters advance its screen and the clock ── */
-const chs = [...document.querySelectorAll(".ch")];
-const devScreen = document.getElementById("dev-screen"), devTime = document.getElementById("dev-time"), devLabel = document.getElementById("dev-label"), rail = [...document.querySelectorAll("#rail i")];
-const panels = chs.map((ch, i) => {
-  const p = document.createElement("div"); p.className = "panel" + (i === 0 ? " active" : "");
-  const card = ch.querySelector(".vis .card").cloneNode(true); card.removeAttribute("aria-label");
-  p.appendChild(card); devScreen.appendChild(p); return p;
-});
-const setTime = t => { devTime.innerHTML = [...t].map(c => `<span>${c}</span>`).join(""); devTime.classList.remove("roll"); void devTime.offsetWidth; devTime.classList.add("roll"); };
-setTime("19:00");
-let active = -1;
-const activate = i => {
-  if (i === active) return; active = i;
-  chs.forEach((c, k) => c.classList.toggle("active", k === i));
-  panels.forEach((p, k) => p.classList.toggle("active", k === i));
-  rail.forEach((r, k) => r.classList.toggle("on", k <= i));
-  setTime(chs[i].dataset.time); devLabel.textContent = chs[i].dataset.label;
-  const pc = panels[i].querySelector(".split, .week"); if (pc) requestAnimationFrame(() => panels[i].querySelectorAll(".split, .week").forEach(el => el.classList.add("drawn")));
-};
-activate(0);
-const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) activate(chs.indexOf(e.target)); }), { rootMargin: "-45% 0px -45% 0px" });
-chs.forEach(c => io.observe(c));
-
-/* path lengths for the split diagram draw-on (inline + device copies) */
-document.querySelectorAll(".flowp").forEach(p => { try { p.style.setProperty("--L", p.getTotalLength().toFixed(1)); } catch (e) {} });
-/* inline (mobile) visuals draw when scrolled into view */
-const io2 = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("drawn"); io2.unobserve(e.target); } }), { threshold: .3 });
-document.querySelectorAll(".ch .vis .split, .ch .vis .week").forEach(el => io2.observe(el));
-if (reduce) document.querySelectorAll(".split, .week").forEach(el => el.classList.add("drawn"));
-
-/* order card: the help chip toggles to show how the destination changes */
-const setHelp = on => document.querySelectorAll(".helpchip").forEach(c => { c.classList.toggle("on", on); const h = c.closest(".mi").querySelector(".helphint"); if (h) h.textContent = on ? "ヘルプ → キャストA（全額 キャストAの売上）" : "この1杯: 指名% → キャストA ／ フリー% → キャストD"; });
-if (!reduce) { let on = false; setInterval(() => { on = !on; setHelp(on); }, 2600); }
-
-/* ── dawn: the sky warms as the night ends ── */
-const sky = document.querySelector(".sky");
-const marks = [["19:00", "開店"], ...chs.map(c => [c.dataset.time, c.dataset.label]), ["05:00", "夜明け"]];
-const toMin = t => { let [h, m] = t.split(":").map(Number); if (h < 12) h += 24; return h * 60 + m; };
-const fmt = m => String(Math.floor(m / 60) % 24).padStart(2, "0") + ":" + String(Math.round(m % 60)).padStart(2, "0");
-let A = [];
-const anchors = () => { const els = [document.getElementById("night"), ...chs, document.getElementById("dawn")]; A = els.map((el, i) => ({ y: el.getBoundingClientRect().top + scrollY - innerHeight * .5, m: toMin(marks[i][0]), l: marks[i][1] })); };
-anchors();
-const clock = () => {
-  const y = scrollY; let m = A[0].m, l = A[0].l;
-  for (let i = 0; i < A.length - 1; i++) if (y >= A[i].y) { const p = clamp((y - A[i].y) / Math.max(1, A[i + 1].y - A[i].y)); m = A[i].m + (A[i + 1].m - A[i].m) * p; l = A[i].l; }
-  if (y >= A[A.length - 1].y) { m = A[A.length - 1].m; l = A[A.length - 1].l; }
-  sky.style.setProperty("--dawn", clamp((y - A[A.length - 2].y) / Math.max(1, A[A.length - 1].y - A[A.length - 2].y)).toFixed(3));
-};
-addEventListener("scroll", clock, { passive: true });
-addEventListener("resize", () => { anchors(); clock(); });
-clock();
-
-/* ── figures count up as they come into view ── */
-const fmtN = v => Math.round(v).toLocaleString("ja-JP");
-const countUp = el => {
-  const to = +el.dataset.to, from = el.dataset.from ? +el.dataset.from : 0, dur = to >= 1000 ? 1600 : 1100, t0 = performance.now();
-  const step = now => { const k = clamp((now - t0) / dur); el.textContent = fmtN(from + (to - from) * ease(k)); if (k < 1) requestAnimationFrame(step); };
-  requestAnimationFrame(step);
-};
-const figs = document.querySelectorAll(".fig[data-to]");
-if (!reduce && "IntersectionObserver" in window) {
-  const io3 = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; countUp(e.target); const fc = e.target.closest(".fact"); if (fc) fc.classList.add("in"); io3.unobserve(e.target); }), { threshold: .6 });
-  figs.forEach(el => io3.observe(el));
-} else document.querySelectorAll(".fact").forEach(fc => fc.classList.add("in"));
-
-/* magnetic primary buttons */
-if (matchMedia("(hover: hover) and (pointer: fine)").matches && !reduce) document.querySelectorAll(".mag").forEach(b => {
-  b.addEventListener("pointermove", e => { const r = b.getBoundingClientRect(); b.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * .18}px,${(e.clientY - r.top - r.height / 2) * .3}px)`; });
-  b.addEventListener("pointerleave", () => { b.style.transform = ""; });
-});
-
-if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined" || reduce) return;
-gsap.registerPlugin(ScrollTrigger);
-gsap.ticker.lagSmoothing(0); // time-based: slow frames never leave the intro unfinished
-
-/* intro */
-gsap.from(".hero h1 .ln>span", { yPercent: 105, duration: 1.3, ease: "expo.out", stagger: .1, delay: .1 });
-gsap.from(".hero .kicker, .hero .lead, .hero .acts", { y: 16, opacity: 0, duration: 1.1, ease: "expo.out", stagger: .08, delay: .45 });
-gsap.from(".sys", { opacity: 0, duration: 1.2, delay: .9 });
-
-/* reveal the rest */
-gsap.utils.toArray(".night-intro > *, .venue, .feat, .ct, .flow li, .faq details, .sec-hd > *").forEach((el, i) => {
-  gsap.from(el, { y: 26, opacity: 0, duration: 1, ease: "expo.out", delay: (i % 4) * .06, scrollTrigger: { trigger: el, start: "top 90%" } });
-});
-gsap.from(".price .plan", { y: 40, opacity: 0, duration: 1.2, ease: "expo.out", scrollTrigger: { trigger: ".price", start: "top 80%" } });
-gsap.from(".dawn > *", { y: 26, opacity: 0, duration: 1.2, ease: "expo.out", stagger: .1, scrollTrigger: { trigger: ".dawn", start: "top 75%" } });
-gsap.from(".giant", { yPercent: 40, opacity: 0, duration: 1.6, ease: "expo.out", scrollTrigger: { trigger: "footer", start: "top 85%" } });
-
-document.fonts && document.fonts.ready.then(() => { ScrollTrigger.refresh(); anchors(); clock(); });
-})();
 </script>
 
 </body>
