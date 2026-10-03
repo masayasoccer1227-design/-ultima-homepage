@@ -80,7 +80,7 @@ html.loaded #ld{transform:translateY(-101%);pointer-events:none}
 #curR{position:fixed;left:0;top:0;width:38px;height:38px;border:1px solid rgba(232,201,142,.5);z-index:299;pointer-events:none;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s}
 html.curbig #cur{width:4px;height:4px}
 html.curbig #curR{width:70px;height:70px;border-color:var(--gold)}
-@media (pointer:coarse){#cur,#curR{display:none}}
+#cur,#curR{display:none} /* custom cursor removed: normal pointer */
 
 /* ---------- header ---------- */
 header{position:fixed;inset:0 0 auto 0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 6vw;mix-blend-mode:difference}
@@ -187,7 +187,7 @@ html.loaded .hero h1 .ch{transform:none}
 #prev .pv:nth-child(3){background:repeating-linear-gradient(45deg,#e8c98e 0 10px,#07060a 10px 22px)}
 #prev .pv:nth-child(4){background:linear-gradient(#1d1626,#1d1626),repeating-linear-gradient(90deg,rgba(155,140,196,.6) 0 1px,transparent 1px 18px),repeating-linear-gradient(0deg,rgba(155,140,196,.6) 0 1px,transparent 1px 18px);background-blend-mode:screen;color:var(--gold)}
 #prev .pv:nth-child(5){background:repeating-linear-gradient(0deg,#c9a15c 0 3px,#07060a 3px 14px),linear-gradient(90deg,#9b8cc4,#07060a);background-blend-mode:multiply}
-@media (pointer:coarse){#prev{display:none}}
+#prev{display:none} /* floating preview tile removed */
 
 /* ---------- tools ---------- */
 #pricing{position:relative;z-index:2;padding:14vh 6vw 16vh}
