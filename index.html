@@ -153,17 +153,27 @@ html.loaded .hero h1 .ch{transform:none}
 #features{position:relative;z-index:2;padding:18vh 0 12vh}
 #features .wh{padding:0 6vw 5vh;display:flex;align-items:baseline;justify-content:space-between}
 #features .wh .en{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--mut);text-transform:uppercase}
+#features .wlead{font-family:var(--sans);font-size:14px;color:var(--txt2);max-width:30em;margin-top:1em;line-height:1.9}
 #features .wh h2{font-family:var(--serif);font-weight:900;font-size:clamp(32px,5vw,64px)}
 .wlist{will-change:transform}
-.row2{position:relative;display:flex;align-items:baseline;gap:4vw;padding:6vh 6vw;border-top:1px solid var(--line);overflow:hidden}
+.row2{position:relative;display:flex;align-items:center;gap:4vw;padding:4.2vh 6vw;border-top:1px solid var(--line);overflow:hidden}
 .row2:last-of-type{border-bottom:1px solid var(--line)}
 .row2::before{content:'';position:absolute;inset:0;background:var(--gold);transform:scaleY(0);transform-origin:bottom;transition:transform .5s cubic-bezier(.76,0,.24,1)}
 .row2:hover::before{transform:scaleY(1)}
 .row2 .rno{position:relative;font-family:var(--mono);font-size:12px;color:var(--mut);transition:color .3s}
-.row2 .rt{position:relative;font-family:var(--serif);font-weight:900;font-size:clamp(34px,7vw,92px);line-height:1.1;transition:color .3s,transform .5s cubic-bezier(.76,0,.24,1)}
-.row2 .ren{position:relative;margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--mut);text-transform:uppercase;transition:color .3s}
+.row2 .rt{position:relative;font-family:var(--serif);font-weight:900;font-size:clamp(28px,4.4vw,60px);line-height:1.1;transition:color .3s,transform .5s cubic-bezier(.76,0,.24,1)}
+.row2 .rmid{position:relative;transition:transform .5s cubic-bezier(.76,0,.24,1)}
+.row2 .rd{font-family:var(--sans);font-size:14px;color:var(--txt2);line-height:1.9;max-width:34em;margin-top:.6em;transition:color .3s}
+.row2 .rright{position:relative;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.row2 .rtags{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.row2 .rtags span{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--mut);border:1px solid var(--line);padding:5px 11px;text-transform:none;transition:color .3s,border-color .3s}
+.row2:hover .rd,.row2:hover .rtags span{color:rgba(7,6,10,.75)}
+.row2:hover .rtags span{border-color:rgba(7,6,10,.35)}
+@media(max-width:760px){.row2{flex-wrap:wrap;align-items:flex-start}.row2 .rmid{flex:1 1 70%}.row2 .rright{margin-left:0;width:100%;align-items:flex-start}.row2 .ren{display:none}.row2 .rtags{justify-content:flex-start}}
+.row2 .ren{position:relative;font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--mut);text-transform:uppercase;transition:color .3s}
 .row2 .rar{position:relative;font-size:clamp(22px,3.4vw,40px);transform:translateX(-12px);opacity:0;transition:transform .5s,opacity .5s;color:#07060a}
-.row2:hover .rt{color:#07060a;transform:translateX(1.6vw)}
+.row2:hover .rt{color:#07060a}
+.row2:hover .rmid{transform:translateX(1.6vw)}
 .row2:hover .rno,.row2:hover .ren{color:rgba(7,6,10,.7)}
 .row2:hover .rar{transform:none;opacity:1}
 
@@ -362,13 +372,13 @@ footer:hover .flogo{color:var(--txt)}
 </div>
 
 <section id="features" data-hud="features">
-  <div class="wh"><h2>機能</h2><span class="en">features — all in one</span></div>
+  <div class="wh"><div><h2>機能</h2><p class="wlead">注文から給料まで。別々の道具を、ひとつの画面にまとめました。</p></div><span class="en">features — all in one</span></div>
   <div class="wlist" id="wlist">
-    <a class="row2" href="#contact" data-pv="0"><span class="rno">01</span><span class="rt">注文・卓管理</span><span class="ren">order &amp; tables</span><span class="rar">→</span></a>
-    <a class="row2" href="#contact" data-pv="1"><span class="rno">02</span><span class="rt">会計</span><span class="ren">checkout</span><span class="rar">→</span></a>
-    <a class="row2" href="#contact" data-pv="2"><span class="rno">03</span><span class="rt">給料計算</span><span class="ren">payroll</span><span class="rar">→</span></a>
-    <a class="row2" href="#contact" data-pv="3"><span class="rno">04</span><span class="rt">出勤管理</span><span class="ren">shifts</span><span class="rar">→</span></a>
-    <a class="row2" href="#contact" data-pv="4"><span class="rno">05</span><span class="rt">売上集計</span><span class="ren">sales</span><span class="rar">→</span></a>
+    <a class="row2" href="#contact" data-pv="0"><span class="rno">01</span><span class="rmid"><span class="rt">注文・卓管理</span><p class="rd">スマホやQRから注文。卓一覧には来店時刻・人数・指名がそのまま出ます。</p></span><span class="rright"><span class="ren">order &amp; tables</span><span class="rtags"><span>QR注文</span><span>卓一覧</span><span>ヘルプの1杯</span></span></span><span class="rar">→</span></a>
+    <a class="row2" href="#contact" data-pv="1"><span class="rno">02</span><span class="rmid"><span class="rt">会計</span><p class="rd">伝票を確定して会計。現金とカードを分けて記録します。</p></span><span class="rright"><span class="ren">checkout</span><span class="rtags"><span>伝票確定</span><span>現金・カード</span><span>取り消し</span></span></span><span class="rar">→</span></a>
+    <a class="row2" href="#contact" data-pv="2"><span class="rno">03</span><span class="rmid"><span class="rt">給料計算</span><p class="rd">バック率と按分を自動で計算。確定した明細を保存します。</p></span><span class="rright"><span class="ren">payroll</span><span class="rtags"><span>バック率</span><span>按分</span><span>明細の保存</span></span></span><span class="rar">→</span></a>
+    <a class="row2" href="#contact" data-pv="3"><span class="rno">04</span><span class="rmid"><span class="rt">出勤管理</span><p class="rd">出勤・退勤ボタンと予約出勤。待機中の人数も自動で出ます。</p></span><span class="rright"><span class="ren">shifts</span><span class="rtags"><span>出退勤</span><span>予約出勤</span><span>待機中</span></span></span><span class="rar">→</span></a>
+    <a class="row2" href="#contact" data-pv="4"><span class="rno">05</span><span class="rmid"><span class="rt">売上集計</span><p class="rd">日次・月次の売上と、キャストごとの内訳。</p></span><span class="rright"><span class="ren">sales</span><span class="rtags"><span>日次</span><span>月次</span><span>キャスト別</span></span></span><span class="rar">→</span></a>
   </div>
 </section>
 
