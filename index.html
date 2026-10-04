@@ -744,7 +744,7 @@ footer:hover .flogo{color:var(--txt)}
       ctx.fillRect(ccx-gR,ccy-gR,gR*2,gR*2);
     }
 
-    var base=mob?1.9:3.8; var alM=mob?.72:1; /* phone: smaller, dimmer dust so text stays readable */
+    var base=mob?1.5:3.8; var alM=mob?.62:1; var szMax=mob?4.5:1e9; /* phone: smaller, dimmer dust so text stays readable */
     var smin=.72, sinv=1/(1.6-.72);
     var useCur=hasPtr&&!coarse&&!reduce;
     var RR=sh.t*Math.max(W,H);
@@ -764,7 +764,7 @@ footer:hover .flogo{color:var(--txt)}
       var s=persp/(persp-z2);
       var sx=ccx+x2*s*K;
       var sy=ccy+y1*s*K;
-      var sz=base*s*s;
+      var sz=base*s*s; if(sz>szMax){sz=szMax;}
       var al=(s-smin)*sinv;
       if(al>1){al=1;}if(0>al){al=0;}
       al=(.15+.85*al)*alM;
